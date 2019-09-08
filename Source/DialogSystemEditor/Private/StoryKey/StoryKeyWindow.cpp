@@ -147,7 +147,7 @@ void SStoryKeyWindow::UpdateKeys()
 
 	keysRaw.Sort([](const FName& a, const FName& b)
 	{
-		return a.Compare(b);
+		return a.Compare(b) != INDEX_NONE;
 	});
 
 	for (auto key : keysRaw)

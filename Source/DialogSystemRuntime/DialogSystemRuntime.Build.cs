@@ -6,16 +6,16 @@ public class DialogSystemRuntime : ModuleRules
     {
 
         PublicIncludePaths.AddRange(
-            new string[] {
-                "DialogSystemRuntime/Public"
-            }
+	        new string[] {
+		        // ... add public include paths required here ...
+	        }
         );
 
 
         PrivateIncludePaths.AddRange(
-            new string[] {
-                "DialogSystemRuntime/Private"
-            }
+	        new string[] {
+		        // ... add public include paths required here ...
+	        }
         );
 
 

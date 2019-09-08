@@ -5,16 +5,16 @@ public class DialogSystemEditor : ModuleRules
     public DialogSystemEditor(ReadOnlyTargetRules Target) : base(Target)
     {
         PublicIncludePaths.AddRange(
-            new string[] {
-                "DialogSystemEditor/Public",
-            }
+	        new string[] {
+		        // ... add public include paths required here ...
+	        }
         );
 
 
         PrivateIncludePaths.AddRange(
-            new string[] {
-                "DialogSystemEditor/Private",
-            }
+	        new string[] {
+		        // ... add public include paths required here ...
+	        }
         );
 
 
