@@ -10,7 +10,17 @@ UStoryKeyManager* UStoryKeyManager::Instance = NULL;
 UStoryKeyManager* UStoryKeyManager::GetStoryKeyManager(UObject* WorldContextObject)
 {
 	if (Instance == NULL)
-		Instance = NewObject<UStoryKeyManager>(WorldContextObject);
+	{
+		if(WorldContextObject)
+		{
+			Instance = NewObject<UStoryKeyManager>(WorldContextObject);
+		}
+		else
+		{
+			Instance = NewObject<UStoryKeyManager>();
+		}
+	}
+		
 
 	return Instance;
 }

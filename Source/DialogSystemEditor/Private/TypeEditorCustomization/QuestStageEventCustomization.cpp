@@ -36,7 +36,33 @@ BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 void FQuestStageEventCustomization::CustomizeHeader(TSharedRef<IPropertyHandle> InStructPropertyHandle, FDetailWidgetRow& HeaderRow, IPropertyTypeCustomizationUtils& StructCustomizationUtils)
 {
 	StructPropertyHandle = InStructPropertyHandle;
-	
+
+	TSharedPtr<IPropertyHandle> ObjectClassProperty = GET_PROPERTY(ObjectClass);
+
+	UObject* Property_ObjectClass;
+
+	ObjectClassProperty->GetValue(Property_ObjectClass);
+
+	FunctionsList.Empty();
+
+	if(UClass* Cls = Cast<UClass>(Property_ObjectClass))
+	{
+		TArray<FName> Functions;
+		Cls->GenerateFunctionList(Functions);
+
+		TArray<UFunction*> Out;
+
+		for(const FName& F : Functions)
+		{
+			UFunction* Func = Cls->FindFunctionByName(F, EIncludeSuperFlag::ExcludeSuper);
+
+			Out.Add(Func);
+			TSharedPtr<FunctionItem> Item = MakeShareable(new FunctionItem);
+			Item->Name = F.ToString();
+
+			FunctionsList.Add(Item);
+		}
+	}
 	HeaderRow.NameContent()
 		[
 			StructPropertyHandle->CreatePropertyNameWidget(StructPropertyHandle->GetPropertyDisplayName())
@@ -59,6 +85,22 @@ void FQuestStageEventCustomization::CustomizeHeader(TSharedRef<IPropertyHandle> 
 void FQuestStageEventCustomization::CustomizeChildren(TSharedRef<IPropertyHandle> InStructPropertyHandle, IDetailChildrenBuilder& StructBuilder, IPropertyTypeCustomizationUtils& StructCustomizationUtils)
 {
 	StructBuilder.AddProperty(GET_PROPERTY(CallType).ToSharedRef());
+
+	FDetailWidgetRow& EventRow = StructBuilder.AddCustomRow(FText::FromString(""));
+
+	auto GenerateWidget = [](TSharedPtr<FunctionItem> InItem) -> TSharedRef<SWidget>
+	{
+		return SNew(STextBlock).Text(FText::FromString(InItem->Name));
+	};
+
+	EventRow.NameContent()
+		[
+			SNew(STextBlock).Text(FText::FromString("EventName"))
+		].ValueContent()
+		[
+			SNew(SComboBox<TSharedPtr<FunctionItem>>).OptionsSource(&FunctionsList).OnGenerateWidget_Lambda(GenerateWidget)
+		];
+
 	StructBuilder.AddProperty(GET_PROPERTY(EventName).ToSharedRef());
 
 	StructBuilder.AddProperty(GET_PROPERTY(ObjectClass).ToSharedRef())

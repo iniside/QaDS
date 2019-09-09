@@ -6,7 +6,13 @@
 class DIALOGSYSTEMEDITOR_API FQuestStageEventCustomization : public IPropertyTypeCustomization
 {
 	TSharedPtr<IPropertyHandle> StructPropertyHandle;
+	
+	struct FunctionItem
+	{
+		FString Name;
+	};
 
+	TArray<TSharedPtr<FunctionItem>> FunctionsList;
 public:
 	static TSharedRef<IPropertyTypeCustomization> MakeInstance();
 
