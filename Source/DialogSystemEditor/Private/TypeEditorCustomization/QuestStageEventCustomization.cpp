@@ -154,10 +154,22 @@ FReply FQuestStageEventCustomization::OnTitleClick()
 
 FText FQuestStageEventCustomization::GetTitleText() const
 {
-	FQuestStageEvent stageEvent;
-	StructPropertyHandle->GetValue((uint8&)stageEvent);
+	void* stageEvent = nullptr;;
 
-	return FText::FromString(stageEvent.ToString());
+	StructPropertyHandle->GetValueData(stageEvent);
+
+	FQuestStageEvent* E = nullptr;
+	if(stageEvent)
+	{
+		E = reinterpret_cast<FQuestStageEvent*>(stageEvent);
+	}
+
+	if(!E)
+	{
+		return FText::FromString("None");
+	}
+
+	return FText::FromString(E->ToString());
 }
 
 EVisibility FQuestStageEventCustomization::GetFingTagVisibility() const

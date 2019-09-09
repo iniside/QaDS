@@ -128,14 +128,15 @@ FGuid FQuestAssetEditor::Compile(UQaDSEdGraphNode* node)
 
 	node->SetCompile();
 
-	FQuestStageInfo stage;
-	stage.UID = node->NodeGuid;
+	 
+	
 
 	auto stageNode = Cast<UQuestStageEdGraphNode>(node);
 	if (stageNode != NULL)
 	{
 		stageNode->Stage.UID = node->NodeGuid;
-		stage = stageNode->Stage;
+		FQuestStageInfo& stage = stageNode->Stage;
+		stage.UID = node->NodeGuid;
 
 		FString ErrorMessage;
 		for (auto& Event : stage.Action)
@@ -169,6 +170,8 @@ FGuid FQuestAssetEditor::Compile(UQaDSEdGraphNode* node)
 				CompileLogResults.Error(*(ErrorMessage));
 			}
 		}
+
+		EditedAsset->Nodes.Add(node->NodeGuid, stage);
 	}
 
 	auto childs = node->GetChildNodes();
@@ -183,7 +186,7 @@ FGuid FQuestAssetEditor::Compile(UQaDSEdGraphNode* node)
 		joins.UIDs.Add(Compile(child));
 	}
 
-	EditedAsset->Nodes.Add(node->NodeGuid, stage);
+	
 	EditedAsset->Joins.Add(node->NodeGuid, joins);
 
 	return node->NodeGuid;
