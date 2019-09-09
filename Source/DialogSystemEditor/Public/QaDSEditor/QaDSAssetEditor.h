@@ -32,7 +32,8 @@ private:
 
 class DIALOGSYSTEMEDITOR_API FQaDSAssetEditor : public FAssetEditorToolkit, public FNotifyHook
 {
-	UObject* EditedAsset;
+protected:
+	UObject* EditedObject;
 
 public:
 	~FQaDSAssetEditor();

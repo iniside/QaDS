@@ -24,6 +24,7 @@
 #include "FileHelper.h"
 #include "DesktopPlatformModule.h"
 #include "XmlFile.h"
+#include "QuestEditorNodes.h"
 
 #define LOCTEXT_NAMESPACE "QaDSGraph"
 
@@ -143,7 +144,7 @@ TSharedRef<SDockTab> FQaDSAssetEditor::SpawnTab_CompilerResults(const FSpawnTabA
 TSharedRef<SDockTab> FQaDSAssetEditor::SpawnTab_Details(const FSpawnTabArgs& Args)
 {
 	FPropertyEditorModule& PropertyEditorModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
-	const FDetailsViewArgs DetailsViewArgs(false, false, true, FDetailsViewArgs::HideNameArea, true, this);
+	const FDetailsViewArgs DetailsViewArgs(true, true, true, FDetailsViewArgs::HideNameArea, true, this);
 	TSharedRef<IDetailsView> PropertyEditorRef = PropertyEditorModule.CreateDetailView(DetailsViewArgs);
 	PropertyEditor = PropertyEditorRef;
 	PropertyEditor->OnFinishedChangingProperties().AddRaw(this, &FQaDSAssetEditor::OnPropertyChanged);
@@ -215,7 +216,17 @@ void FQaDSAssetEditor::OnSelectedNodesChanged(const TSet<UObject*>& NewSelection
 	}
 
 	if(SelectedObjects.Num() == 0)
-		SelectedObjects.Add(EditedAsset);
+	{
+		SelectedObjects.Add(EditedObject);
+	}
+	else if(SelectedObjects.Num() == 1)
+	{
+		if(UQuestRootEdGraphNode* Root = Cast< UQuestRootEdGraphNode>(SelectedObjects[0]))
+		{
+			SelectedObjects.Empty();
+			SelectedObjects.Add(EditedObject);
+		}
+	}
 
 	if(PropertyEditor.IsValid())
 		PropertyEditor->SetObjects(SelectedObjects);
@@ -302,11 +313,11 @@ void FQaDSAssetEditor::ImportExecute()
 
 void FQaDSAssetEditor::CompileExecute()
 {
-	UE_LOG(DialogModuleLog, Log, TEXT("Compile dialog %s"), *EditedAsset->GetPathName());
+	UE_LOG(DialogModuleLog, Log, TEXT("Compile dialog %s"), *EditedObject->GetPathName());
 
 	CompileLogResults = FCompilerResultsLog();
 	CompileLogResults.BeginEvent(TEXT("Compile"));
-	CompileLogResults.SetSourcePath(EditedAsset->GetPathName());
+	CompileLogResults.SetSourcePath(EditedObject->GetPathName());
 
 	CompileLogResults.Note(TEXT("Compile dialog"));
 
@@ -439,7 +450,7 @@ void FQaDSAssetEditor::PasteNodesHere(const FVector2D& Location)
 	FString TextToImport;
 	FPlatformApplicationMisc::ClipboardPaste(TextToImport);
 
-	if (EditedAsset == NULL)
+	if (EditedObject == NULL)
 		return;
 
 	TSet<UEdGraphNode*> PastedNodes;

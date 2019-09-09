@@ -43,7 +43,7 @@ public:
 	bool bIsSingltone = true;
 
 	UPROPERTY(EditAnywhere, meta = (DisplayName = "QuestScript"))
-	TAssetSubclassOf<AQuestScript> QuestScriptClass;
+	TSoftClassPtr<AQuestScript> QuestScriptClass;
 	
 #if WITH_EDITORONLY_DATA
 	UPROPERTY()

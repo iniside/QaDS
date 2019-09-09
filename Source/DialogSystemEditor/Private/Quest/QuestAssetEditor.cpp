@@ -40,7 +40,8 @@ void FQuestAssetEditor::InitQuestAssetEditor(const EToolkitMode::Type Mode, cons
 {
 	FAssetEditorManager::Get().CloseOtherEditors(Object, this);
 	EditedAsset = Object;
-
+	EditedObject = Object;
+	
 	if (EditedAsset->UpdateGraph == NULL)
 		EditedAsset->UpdateGraph = CreateGraphFromAsset();
 	
