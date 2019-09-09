@@ -32,9 +32,9 @@ TSharedRef<IPropertyTypeCustomization> FDialogPhraseEventCustomization::MakeInst
 	return MakeShareable(new FDialogPhraseEventCustomization());
 }
 
-void FDialogPhraseEventCustomization::CustomizeHeader(TSharedRef<IPropertyHandle> structPropertyHandle, FDetailWidgetRow& HeaderRow, IPropertyTypeCustomizationUtils& StructCustomizationUtils)
+void FDialogPhraseEventCustomization::CustomizeHeader(TSharedRef<IPropertyHandle> InStructPropertyHandle, FDetailWidgetRow& HeaderRow, IPropertyTypeCustomizationUtils& StructCustomizationUtils)
 {
-	StructPropertyHandle = structPropertyHandle;
+	StructPropertyHandle = InStructPropertyHandle;
 
 	HeaderRow.NameContent()
 		[
@@ -55,7 +55,7 @@ void FDialogPhraseEventCustomization::CustomizeHeader(TSharedRef<IPropertyHandle
 		];
 }
 
-void FDialogPhraseEventCustomization::CustomizeChildren(TSharedRef<IPropertyHandle> StructPropertyHandle, IDetailChildrenBuilder& StructBuilder, IPropertyTypeCustomizationUtils& StructCustomizationUtils)
+void FDialogPhraseEventCustomization::CustomizeChildren(TSharedRef<IPropertyHandle> InStructPropertyHandle, IDetailChildrenBuilder& StructBuilder, IPropertyTypeCustomizationUtils& StructCustomizationUtils)
 {
 	StructBuilder.AddProperty(GET_PROPERTY(CallType).ToSharedRef());
 	StructBuilder.AddProperty(GET_PROPERTY(EventName).ToSharedRef());

@@ -33,9 +33,9 @@ TSharedRef<IPropertyTypeCustomization> FQuestStageEventCustomization::MakeInstan
 }
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
-void FQuestStageEventCustomization::CustomizeHeader(TSharedRef<IPropertyHandle> structPropertyHandle, FDetailWidgetRow& HeaderRow, IPropertyTypeCustomizationUtils& StructCustomizationUtils)
+void FQuestStageEventCustomization::CustomizeHeader(TSharedRef<IPropertyHandle> InStructPropertyHandle, FDetailWidgetRow& HeaderRow, IPropertyTypeCustomizationUtils& StructCustomizationUtils)
 {
-	StructPropertyHandle = structPropertyHandle;
+	StructPropertyHandle = InStructPropertyHandle;
 	
 	HeaderRow.NameContent()
 		[
@@ -56,7 +56,7 @@ void FQuestStageEventCustomization::CustomizeHeader(TSharedRef<IPropertyHandle> 
 		];
 }
 
-void FQuestStageEventCustomization::CustomizeChildren(TSharedRef<IPropertyHandle> StructPropertyHandle, IDetailChildrenBuilder& StructBuilder, IPropertyTypeCustomizationUtils& StructCustomizationUtils)
+void FQuestStageEventCustomization::CustomizeChildren(TSharedRef<IPropertyHandle> InStructPropertyHandle, IDetailChildrenBuilder& StructBuilder, IPropertyTypeCustomizationUtils& StructCustomizationUtils)
 {
 	StructBuilder.AddProperty(GET_PROPERTY(CallType).ToSharedRef());
 	StructBuilder.AddProperty(GET_PROPERTY(EventName).ToSharedRef());

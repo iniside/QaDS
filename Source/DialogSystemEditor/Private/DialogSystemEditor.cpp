@@ -33,9 +33,9 @@ void FDialogSystemEditorModule::StartupModule()
 	FQuestCommands::Register();
 
 	auto& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
-	AssetCategory = AssetTools.RegisterAdvancedAssetCategory(FName(TEXT("Gameplay")), LOCTEXT("GameplayAssetCategory", "Gameplay"));
-	AssetTools.RegisterAssetTypeActions(MakeShareable(new FDialogAssetTypeActions(AssetCategory)));
-	AssetTools.RegisterAssetTypeActions(MakeShareable(new FQuestAssetTypeActions(AssetCategory)));
+	
+	AssetTools.RegisterAssetTypeActions(MakeShareable(new FDialogAssetTypeActions(EAssetTypeCategories::Gameplay)));
+	AssetTools.RegisterAssetTypeActions(MakeShareable(new FQuestAssetTypeActions(EAssetTypeCategories::Gameplay)));
 	
 	auto& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 	PropertyModule.RegisterCustomClassLayout("DialogPhraseEdGraphNode", FOnGetDetailCustomizationInstance::CreateStatic(&FPhraseNodeDetails::MakeInstance));
