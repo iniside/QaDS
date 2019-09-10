@@ -244,8 +244,6 @@ void UQuestComponent::StartQuest(TAssetPtr<UQuestAsset> QuestAsset)
 	}
 
 	FQuestItem StartNode;
-	
-	auto runtimeQuest = NewObject<UQuestRuntimeAsset>();
 	StartNode.Status = EQuestCompleteStatus::Active;
 	StartNode.Asset = Quest;
 	//runtimeQuest->CreateScript();

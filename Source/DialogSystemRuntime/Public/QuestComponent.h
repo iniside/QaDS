@@ -22,13 +22,7 @@ public:
 	FGuid UUID;
 	
 	UPROPERTY()
-	FName Id;
-	
-	UPROPERTY()
 	EQuestCompleteStatus Status;
-
-	UPROPERTY()
-	class UQuestProcessor* Processor;
 
 	UPROPERTY()
 	TArray<FGuid> Childs;
@@ -43,12 +37,12 @@ public:
 	
 	bool operator==(const FQuestItemNode& Rhs)
 	{
-		return Id == Rhs.Id;
+		return UUID == Rhs.UUID;
 	}
 	
 	bool operator==(const FQuestItemNode* Rhs)
 	{
-		return Id == Rhs->Id;
+		return UUID == Rhs->UUID;
 	}
 	struct FQuestItem& GetOwner(class UQuestComponent* Owner);
 	

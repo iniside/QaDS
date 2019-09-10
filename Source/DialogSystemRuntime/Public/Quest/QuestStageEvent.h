@@ -45,8 +45,8 @@ public:
 	TArray<FString> Parameters;
 
 	virtual bool Compile(UQuestAsset* Quest, FString& ErrorMessage);
-	virtual UObject* GetObject(UQuestRuntimeNode* QuestNode) const;
-	virtual void Invoke(UQuestRuntimeNode* QuestNode);
+	virtual UObject* GetObject(struct FQuestItemNode* QuestNode, class UQuestComponent* InQC) const;
+	virtual void Invoke(struct FQuestItemNode* QuestNode);
 	virtual ~FQuestStageEvent() {}
 
 	virtual FString ToString() const;
@@ -63,7 +63,7 @@ public:
 	bool InvertCondition;
 
 	virtual bool Compile(UQuestAsset* Quest, FString& ErrorMessage) override;
-	virtual bool InvokeCheck(UQuestRuntimeNode* QuestNode) const;
+	virtual bool InvokeCheck(struct FQuestItemNode* QuestNode, class UQuestComponent* InQC) const;
 	virtual FString ToString() const override;
 	virtual ~FQuestStageCondition() {}
 

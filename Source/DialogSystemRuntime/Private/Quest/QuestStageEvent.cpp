@@ -11,6 +11,8 @@
 #include "QuestScript.h"
 #include "QuestStageEvent.h"
 
+#include "QuestComponent.h"
+
 bool FQuestStageEvent::Compile(UQuestAsset* Quest, FString& ErrorMessage)
 {
 	if (EventName.IsNone())
@@ -120,32 +122,33 @@ bool FQuestStageCondition::Compile(UQuestAsset* Quest, FString& ErrorMessage)
 	return true;
 }
 
-UObject* FQuestStageEvent::GetObject(UQuestRuntimeNode* QuestNode) const
+UObject* FQuestStageEvent::GetObject(struct FQuestItemNode* QuestNode, class UQuestComponent* InQC) const
 {
-	UObject* obj = NULL;
-	auto quest = QuestNode->OwnerQuest;
+	UObject* obj = nullptr;
+	FQuestItem& quest = QuestNode->GetOwner(InQC);
 
 	switch (CallType)
 	{
 	case EQuestStageEventCallType::QuestScript:
-		obj = Cast<UObject>(quest->Script);
+		obj = Cast<UObject>(quest.Script);
 		break;
 
 	case EQuestStageEventCallType::Player:
-		if (quest->Script == NULL)
+		if (quest.Script == nullptr)
 		{
-			UE_LOG(DialogModuleLog, Warning, TEXT("Need QuestScript for EQuestStageEventCallType::Player in %s"), *quest->GetPathName());
-			return NULL;
+			UE_LOG(DialogModuleLog, Warning, TEXT("Need QuestScript for EQuestStageEventCallType::Player in %s"), *quest.Asset->GetPathName());
+			return nullptr;
 		}
 
-		obj = UGameplayStatics::GetPlayerCharacter(quest->Script->GetWorld(), 0);
+		obj = UGameplayStatics::GetPlayerCharacter(quest.Script->GetWorld(), 0);
 		break;
 
+		//TODO:: IDK what this shit do, but it needs to be done bit differently.
 	case EQuestStageEventCallType::FindByTag:
 		for (FObjectIterator Itr(ObjectClass); Itr; ++Itr)
 		{
 			auto actor = Cast<AActor>(*Itr);
-			if (actor != NULL)
+			if (actor != nullptr)
 			{
 				if (actor->Tags.Contains(*FindTag))
 				{
@@ -155,7 +158,7 @@ UObject* FQuestStageEvent::GetObject(UQuestRuntimeNode* QuestNode) const
 			}
 
 			auto component = Cast<UActorComponent>(*Itr);
-			if (component != NULL)
+			if (component != nullptr)
 			{
 				if (component->ComponentHasTag(*FindTag))
 				{
@@ -170,16 +173,16 @@ UObject* FQuestStageEvent::GetObject(UQuestRuntimeNode* QuestNode) const
 		break;
 	}
 
-	if (obj == NULL)
-		UE_LOG(DialogModuleLog, Warning, TEXT("Event terget not found in %s"), *quest->GetPathName());
+	if (obj == nullptr)
+		UE_LOG(DialogModuleLog, Warning, TEXT("Event terget not found in %s"), *quest.Asset->GetPathName()));
 
 	return obj;
 }
 
-void FQuestStageEvent::Invoke(UQuestRuntimeNode* QuestNode)
+void FQuestStageEvent::Invoke(struct FQuestItemNode* QuestNode, class UQuestComponent* InQC)
 {
-	auto obj = GetObject(QuestNode);
-	if (obj != NULL)
+	UObject* obj = GetObject(QuestNode, InQC);
+	if (obj != nullptr)
 	{ 
 		auto ar = FOutputDeviceRedirector::Get();
 		obj->CallFunctionByNameWithArguments(*Command, *ar, obj, true);
@@ -219,9 +222,9 @@ FString FQuestStageEvent::ToString() const
 	return TEXT("None");
 }
 
-bool FQuestStageCondition::InvokeCheck(UQuestRuntimeNode* QuestNode) const
+bool FQuestStageCondition::InvokeCheck(struct FQuestItemNode* QuestNode, class UQuestComponent* InQC) const
 {
-	auto obj = GetObject(QuestNode);
+	auto obj = GetObject(QuestNode, InQC);
 
 	if (obj == NULL)
 	{
