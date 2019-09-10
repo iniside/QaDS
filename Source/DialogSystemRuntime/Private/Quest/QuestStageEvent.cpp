@@ -174,7 +174,7 @@ UObject* FQuestStageEvent::GetObject(struct FQuestItemNode* QuestNode, class UQu
 	}
 
 	if (obj == nullptr)
-		UE_LOG(DialogModuleLog, Warning, TEXT("Event terget not found in %s"), *quest.Asset->GetPathName()));
+		UE_LOG(DialogModuleLog, Warning, TEXT("Event terget not found in %s"), *quest.Asset->GetPathName());
 
 	return obj;
 }
