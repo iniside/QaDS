@@ -46,7 +46,7 @@ public:
 
 	virtual bool Compile(UQuestAsset* Quest, FString& ErrorMessage);
 	virtual UObject* GetObject(struct FQuestItemNode* QuestNode, class UQuestComponent* InQC) const;
-	virtual void Invoke(struct FQuestItemNode* QuestNode);
+	virtual void Invoke(struct FQuestItemNode* QuestNode, class UQuestComponent* InQC);
 	virtual ~FQuestStageEvent() {}
 
 	virtual FString ToString() const;
