@@ -17,6 +17,10 @@ private:
 	TArray<FQuestItemNode> CachedChilds;
 public:
 	friend class UQuestComponent;
+
+	UPROPERTY()
+	FGuid UUID;
+	
 	UPROPERTY()
 	FName Id;
 	
@@ -26,46 +30,39 @@ public:
 	UPROPERTY()
 	class UQuestProcessor* Processor;
 
-	UPROPERTY(BlueprintReadOnly)
-	UQuestAsset* Asset;
-
 	UPROPERTY()
 	TArray<FGuid> Childs;
 
-	UPROPERTY(BlueprintReadOnly)
-	FQuestStageInfo Stage;
-
 	UPROPERTY()
-	class UQuestAsset* OwnerQuest;
+	class UQuestAsset* QuestAsset;
 
-
+	const FQuestStageInfo& GetStage() const
+	{
+		return QuestAsset->Nodes[UUID];
+	}
+	
+	bool operator==(const FQuestItemNode& Rhs)
+	{
+		return Id == Rhs.Id;
+	}
+	
+	bool operator==(const FQuestItemNode* Rhs)
+	{
+		return Id == Rhs->Id;
+	}
 	struct FQuestItem& GetOwner(class UQuestComponent* Owner);
 	
 	FQuestItemNode LoadNode(FGuid Uid)
 	{
 		FQuestItemNode Node;
-		Childs = Asset->Joins[Uid].UIDs;
-		Stage = Asset->Nodes[Uid];
+		Node.QuestAsset = QuestAsset;
+		Node.Childs = QuestAsset->Joins[Uid].UIDs;
+		Node.UUID = Uid;
 		return Node;
 	}
 
-	bool CkeckForActivate(class UQuestComponent* Owner) const
-	{
-		//if (Processor->StoryKeyManager->DontHasKey(Stage.CheckHasKeys))
-		//	return false;
-		//
-		//if (Processor->StoryKeyManager->HasKey(Stage.CheckDontHasKeys))
-		//	return false;
+	bool CkeckForActivate(class UQuestComponent* Owner) const;
 
-		for (auto& Conditions : Stage.Predicate)
-		{
-			//if (!Conditions.InvokeCheck(this))
-			//	return false;
-		}
-
-		return true;
-	}
-	
 	TArray<FQuestItemNode> GetNextStage(class UQuestComponent* Owner)
 	{
 		if (CachedChilds.Num() == 0)
@@ -83,165 +80,21 @@ public:
 	}
 
 
-	void Activate()
-	{
-		//OwnerQuest->ActiveNodes.Add(this);
-		//
-		//if (TryComplete())
-		//	return;
-		//
-		//if (Stage.WaitHasKeys.Num() > 0 ||
-		//	Stage.WaitDontHasKeys.Num() > 0 ||
-		//	Stage.FailedIfGiveKeys.Num() > 0 ||
-		//	Stage.FailedIfRemoveKeys.Num() > 0)
-		//{
-		//	Processor->StoryKeyManager->OnKeyRemoveBP.AddDynamic(this, &UQuestRuntimeNode::OnChangeStoryKey);
-		//	Processor->StoryKeyManager->OnKeyAddBP.AddDynamic(this, &UQuestRuntimeNode::OnChangeStoryKey);
-		//}
-		//
-		//if (Stage.FailedTriggers.Num() > 0 || Stage.WaitTriggers.Num() > 0)
-		//{
-		//	Processor->StoryTriggerManager->OnTriggerInvoke.AddDynamic(this, &UQuestRuntimeNode::OnTrigger);
-		//}
-	}
+	void Activate(class UQuestComponent* Owner);
 
-	void Failed()
-	{
-		//if (Stage.bFailedQuest || OwnerQuest->ActiveNodes.Num() == 1)
-		//{
-		//	Processor->EndQuest(OwnerQuest, EQuestCompleteStatus::Failed);
-		//}
-	}
+	void Failed(class UQuestComponent* Owner);
 
-	void Complete()
-	{
-		//if (Stage.ChangeOderActiveStagesState != EQuestCompleteStatus::None)
-		//{
-		//	auto nodes = OwnerQuest->ActiveNodes;
-		//	for (auto stage : nodes)
-		//	{
-		//		if (stage == this)
-		//			continue;
-		//
-		//		stage->SetStatus(Stage.ChangeOderActiveStagesState);
-		//	}
-		//}
-		//
-		//if (Stage.ChangeQuestState != EQuestCompleteStatus::None)
-		//{
-		//	Processor->EndQuest(OwnerQuest, Stage.ChangeQuestState);
-		//}
-		//
-		//for (auto& Event : Stage.Action)
-		//	Event.Invoke(this);
-	}
+	void Complete(class UQuestComponent* Owner);
 
-	void Deactivate()
-	{
-		//OwnerQuest->ActiveNodes.Remove(this);
-		//OwnerQuest->ArchiveNodes.Add(this);
-		//
-		//Processor->CompleteStage(this);
-		//
-		//Processor->StoryKeyManager->OnKeyRemoveBP.RemoveDynamic(this, &UQuestRuntimeNode::OnChangeStoryKey);
-		//Processor->StoryKeyManager->OnKeyAddBP.RemoveDynamic(this, &UQuestRuntimeNode::OnChangeStoryKey);
-		//Processor->StoryTriggerManager->OnTriggerInvoke.RemoveDynamic(this, &UQuestRuntimeNode::OnTrigger);
-	}
+	void Deactivate(class UQuestComponent* Owner);
+
+	void SetStatus(EQuestCompleteStatus NewStatus, UQuestComponent* Owner);
+
+	bool CkeckForComplete(UQuestComponent* Owner);
+
+	bool CkeckForFailed(UQuestComponent* Owner);
 	
-	void SetStatus(EQuestCompleteStatus NewStatus)
-	{
-		if (NewStatus == Status)
-			return;
-
-		Status = NewStatus;
-
-		switch (Status)
-		{
-		case EQuestCompleteStatus::None:
-			break;
-		case EQuestCompleteStatus::Active:
-			Activate();
-			break;
-		case EQuestCompleteStatus::Completed:
-			Complete();
-			Deactivate();
-			break;
-		case EQuestCompleteStatus::Failed:
-			Failed();
-			Deactivate();
-			break;
-		case EQuestCompleteStatus::Skiped:
-			Deactivate();
-			break;
-		}
-	}
-
-	bool CkeckForComplete(UQuestComponent* Owner)
-	{
-		unimplemented();
-		//for (auto& cond : Stage.WaitTriggers)
-		//{
-		//	if (cond.TotalCount != 0)
-		//		return false;
-		//}
-		//
-		//if (Processor->StoryKeyManager->DontHasKey(Stage.WaitHasKeys))
-		//	return false;
-		//
-		//if (Processor->StoryKeyManager->HasKey(Stage.WaitDontHasKeys))
-		//	return false;
-		//
-		//for (auto& Conditions : Stage.WaitPredicate)
-		//{
-		//	if (!Conditions.InvokeCheck(this))
-		//		return false;
-		//}
-		//
-		return true;
-	}
-
-	bool CkeckForFailed(UQuestComponent* Owner)
-	{
-		unimplemented();
-		//for (auto& cond : Stage.FailedTriggers)
-		//{
-		//	if (cond.TotalCount == 0)
-		//		return true;
-		//}
-		//
-		//if (Processor->StoryKeyManager->HasKey(Stage.FailedIfGiveKeys))
-		//	return true;
-		//
-		//
-		//if (Processor->StoryKeyManager->DontHasKey(Stage.FailedIfRemoveKeys))
-		//	return true;
-		//
-		//
-		//for (auto& Conditions : Stage.FailedPredicate)
-		//{
-		//	if (Conditions.InvokeCheck(this))
-		//		return true;
-		//}
-		//
-		return false;
-	}
-
-	
-	bool TryComplete(UQuestComponent* Owner)
-	{
-		if (CkeckForFailed(Owner))
-		{
-			SetStatus(EQuestCompleteStatus::Failed);
-		}
-		else
-		{
-			if (!CkeckForComplete(Owner))
-				return false;
-
-			SetStatus(EQuestCompleteStatus::Completed);
-		}
-		return true;
-	}
+	bool TryComplete(UQuestComponent* Owner);
 };
 
 USTRUCT(BlueprintType)
@@ -268,8 +121,8 @@ public:
 	{
 		FQuestItemNode Node;
 		Node.Childs = Asset->Joins[Uid].UIDs;
-		Node.Stage = Asset->Nodes[Uid];
-		Node.OwnerQuest = Asset;
+		Node.UUID = Uid;
+		Node.QuestAsset = Asset;
 		return Node;
 	}
 };
@@ -283,10 +136,10 @@ class DIALOGSYSTEMRUNTIME_API UQuestComponent : public UActorComponent
 public:
 	friend struct FQuestItemNode;
 protected:
-	UPROPERTY()
+	UPROPERTY(SaveGame)
 	FGameplayTagContainer QuestTags;
 
-	UPROPERTY()
+	UPROPERTY(SaveGame)
 	TMap<FName, FQuestItem> ActiveQuests;
 	
 	//TArray<TSoftObjectPtr<class UQuestAsset>> ActiveQuests;
@@ -307,8 +160,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Gameplay|Quest")
 	void StartQuest(TAssetPtr<UQuestAsset> QuestAsset);
 
-	void CompleteStage(UQuestRuntimeNode* Stage);
-	void WaitStage(FQuestItemNode& Stage);
+	void CompleteStage(FQuestItemNode& StageNode);
+	void WaitStage(FQuestItemNode& StageNode);
 
 	UFUNCTION(BlueprintCallable, Category = "Gameplay|Quest")
 	void EndQuest(UQuestAsset* Quest, EQuestCompleteStatus QuestStatus);

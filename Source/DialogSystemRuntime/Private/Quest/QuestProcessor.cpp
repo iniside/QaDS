@@ -80,7 +80,7 @@ void UQuestProcessor::WaitStage(UQuestRuntimeNode* StageNode)
 	//	return;
 	//}
 	//
-	//check(StageNode->OwnerQuest);
+	//check(StageNode->QuestAsset);
 	//
 	//auto stages = StageNode->GetNextStage();
 	//auto isOptionalOnly = true;
@@ -92,7 +92,7 @@ void UQuestProcessor::WaitStage(UQuestRuntimeNode* StageNode)
 	//
 	//if (stages.Num() == 0 || isOptionalOnly)
 	//{
-	//	EndQuest(StageNode->OwnerQuest, EQuestCompleteStatus::Completed);
+	//	EndQuest(StageNode->QuestAsset, EQuestCompleteStatus::Completed);
 	//	return;
 	//}
 	//
@@ -102,7 +102,7 @@ void UQuestProcessor::WaitStage(UQuestRuntimeNode* StageNode)
 	//
 	//	if (stage->TryComplete())
 	//	{
-	//		if (StageNode->OwnerQuest->Status != EQuestCompleteStatus::Active)
+	//		if (StageNode->QuestAsset->Status != EQuestCompleteStatus::Active)
 	//			break;
 	//	}
 	//}

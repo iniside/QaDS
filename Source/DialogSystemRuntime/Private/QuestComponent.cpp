@@ -4,10 +4,198 @@
 #include "QuestComponent.h"
 #include "QuestAsset.h"
 #include "ObjectKey.h"
+#include "QaDSSettings.h"
 
 FQuestItem& FQuestItemNode::GetOwner(UQuestComponent* Owner)
 {
-	return Owner->ActiveQuests[OwnerQuest->GetFName()];
+	return Owner->ActiveQuests[QuestAsset->GetFName()];
+}
+
+bool FQuestItemNode::CkeckForActivate(UQuestComponent* Owner) const
+{
+	if(!Owner->QuestTags.HasAll(GetStage().CheckHasKeys))
+	{
+		return false;
+	}
+	if (Owner->QuestTags.HasAll(GetStage().CheckDontHasKeys))
+	{
+		return false;
+	}
+
+	const TArray<FQuestStageCondition>& Predicates = GetStage().Predicate;
+	
+	for (auto& Conditions : Predicates)
+	{
+		//if (!Conditions.InvokeCheck(this))
+		//	return false;
+	}
+
+	return true;
+}
+
+void FQuestItemNode::Activate(UQuestComponent* Owner)
+{
+	FQuestItem& OwnerQuest = GetOwner(Owner);
+	
+	OwnerQuest.ActiveNodes.Add(*this);
+	
+	if (TryComplete(Owner))
+		return;
+
+	const FQuestStageInfo& Stage = GetStage();
+	
+	if (Stage.WaitHasKeys.Num() > 0 ||
+		Stage.WaitDontHasKeys.Num() > 0 ||
+		Stage.FailedIfGiveKeys.Num() > 0 ||
+		Stage.FailedIfRemoveKeys.Num() > 0)
+	{
+	//	Processor->StoryKeyManager->OnKeyRemoveBP.AddDynamic(this, &UQuestRuntimeNode::OnChangeStoryKey);
+	//	Processor->StoryKeyManager->OnKeyAddBP.AddDynamic(this, &UQuestRuntimeNode::OnChangeStoryKey);
+	}
+	
+	if (Stage.FailedTriggers.Num() > 0 || Stage.WaitTriggers.Num() > 0)
+	{
+	//	Processor->StoryTriggerManager->OnTriggerInvoke.AddDynamic(this, &UQuestRuntimeNode::OnTrigger);
+	}
+}
+
+void FQuestItemNode::Failed(UQuestComponent* Owner)
+{
+	if (GetStage().bFailedQuest || GetOwner(Owner).ActiveNodes.Num() == 1)
+	{
+		Owner->EndQuest(QuestAsset, EQuestCompleteStatus::Failed);
+	}
+}
+
+void FQuestItemNode::Complete(UQuestComponent* Owner)
+{
+	const FQuestStageInfo& Stage = GetStage();
+	
+	if (Stage.ChangeOderActiveStagesState != EQuestCompleteStatus::None)
+	{
+		TArray<FQuestItemNode>& nodes = GetOwner(Owner).ActiveNodes;
+		for (FQuestItemNode& stage : nodes)
+		{
+			if (stage == this)
+				continue;
+	
+			stage.SetStatus(Stage.ChangeOderActiveStagesState, Owner);
+		}
+	}
+	
+	if (Stage.ChangeQuestState != EQuestCompleteStatus::None)
+	{
+		Owner->EndQuest(QuestAsset, Stage.ChangeQuestState);
+	}
+	
+	//for (auto& Event : Stage.Action)
+	//	Event.Invoke(this);
+}
+
+void FQuestItemNode::Deactivate(UQuestComponent* Owner)
+{
+	GetOwner(Owner).ActiveNodes.Remove(*this);
+	GetOwner(Owner).ArchiveNodes.Add(*this);
+	//
+	Owner->CompleteStage(*this);
+	//
+	//Processor->StoryKeyManager->OnKeyRemoveBP.RemoveDynamic(this, &UQuestRuntimeNode::OnChangeStoryKey);
+	//Processor->StoryKeyManager->OnKeyAddBP.RemoveDynamic(this, &UQuestRuntimeNode::OnChangeStoryKey);
+	//Processor->StoryTriggerManager->OnTriggerInvoke.RemoveDynamic(this, &UQuestRuntimeNode::OnTrigger);
+}
+
+void FQuestItemNode::SetStatus(EQuestCompleteStatus NewStatus, UQuestComponent* Owner)
+{
+	if (NewStatus == Status)
+		return;
+
+	Status = NewStatus;
+
+	switch (Status)
+	{
+	case EQuestCompleteStatus::None:
+		break;
+	case EQuestCompleteStatus::Active:
+		Activate(Owner);
+		break;
+	case EQuestCompleteStatus::Completed:
+		Complete(Owner);
+		Deactivate(Owner);
+		break;
+	case EQuestCompleteStatus::Failed:
+		Failed(Owner);
+		Deactivate(Owner);
+		break;
+	case EQuestCompleteStatus::Skiped:
+		Deactivate(Owner);
+		break;
+	}
+}
+
+bool FQuestItemNode::CkeckForComplete(UQuestComponent* Owner)
+{
+	unimplemented();
+	//for (auto& cond : Stage.WaitTriggers)
+	//{
+	//	if (cond.TotalCount != 0)
+	//		return false;
+	//}
+	//
+	//if (Processor->StoryKeyManager->DontHasKey(Stage.WaitHasKeys))
+	//	return false;
+	//
+	//if (Processor->StoryKeyManager->HasKey(Stage.WaitDontHasKeys))
+	//	return false;
+	//
+	//for (auto& Conditions : Stage.WaitPredicate)
+	//{
+	//	if (!Conditions.InvokeCheck(this))
+	//		return false;
+	//}
+	//
+	return true;
+}
+
+bool FQuestItemNode::CkeckForFailed(UQuestComponent* Owner)
+{
+	unimplemented();
+	//for (auto& cond : Stage.FailedTriggers)
+	//{
+	//	if (cond.TotalCount == 0)
+	//		return true;
+	//}
+	//
+	//if (Processor->StoryKeyManager->HasKey(Stage.FailedIfGiveKeys))
+	//	return true;
+	//
+	//
+	//if (Processor->StoryKeyManager->DontHasKey(Stage.FailedIfRemoveKeys))
+	//	return true;
+	//
+	//
+	//for (auto& Conditions : Stage.FailedPredicate)
+	//{
+	//	if (Conditions.InvokeCheck(this))
+	//		return true;
+	//}
+	//
+	return false;
+}
+
+bool FQuestItemNode::TryComplete(UQuestComponent* Owner)
+{
+	if (CkeckForFailed(Owner))
+	{
+		SetStatus(EQuestCompleteStatus::Failed, Owner);
+	}
+	else
+	{
+		if (!CkeckForComplete(Owner))
+			return false;
+
+		SetStatus(EQuestCompleteStatus::Completed, Owner);
+	}
+	return true;
 }
 
 // Sets default values for this component's properties
@@ -69,37 +257,62 @@ void UQuestComponent::StartQuest(TAssetPtr<UQuestAsset> QuestAsset)
 	WaitStage(root);
 }
 
-void UQuestComponent::CompleteStage(UQuestRuntimeNode* Stage)
-{
-}
-
-void UQuestComponent::WaitStage(FQuestItemNode& Stage)
+void UQuestComponent::CompleteStage(FQuestItemNode& StageNode)
 {
 	//if (bIsResetBegin)
 	//	return;
-	check(Stage.OwnerQuest);
 	
-	auto Stages = Stage.GetNextStage(this);
+	check(StageNode.QuestAsset);
+
+	if (!ActiveQuests.Contains(StageNode.QuestAsset->GetFName()))
+		return;
+
+	const FQuestStageInfo& Stage = StageNode.GetStage();
+	
+	auto isNeedEvents = Stage.bGenerateEvents;
+	isNeedEvents = !Stage.Caption.IsEmpty();
+
+	auto isEmpty = Stage.Caption.IsEmpty();
+	auto generateForEmpty = !GetDefault<UQaDSSettings>()->bDontGenerateEventForEmptyQuestNode;
+
+	if (generateForEmpty && Stage.bGenerateEvents || !generateForEmpty && !isEmpty)
+	{
+		//OnStageComplete.Broadcast(StageNode->OwnerQuest, StageNode->Stage);
+	}
+
+	if (StageNode.Status == EQuestCompleteStatus::Completed)
+		WaitStage(StageNode);
+}
+
+void UQuestComponent::WaitStage(FQuestItemNode& StageNode)
+{
+	//if (bIsResetBegin)
+	//	return;
+	check(StageNode.QuestAsset);
+
+	const FQuestStageInfo& Stage = StageNode.GetStage();
+	
+	auto Stages = StageNode.GetNextStage(this);
 	auto bIsOptionalOnly = true;
 	
-	for (FQuestItemNode& stage : Stages)
+	for (const FQuestItemNode& stage : Stages)
 	{
-		bIsOptionalOnly &= stage.Stage.bIsOptional;
+		bIsOptionalOnly &= stage.GetStage().bIsOptional;
 	}
 	//
 	if (Stages.Num() == 0 || bIsOptionalOnly)
 	{
-		EndQuest(Stage.OwnerQuest, EQuestCompleteStatus::Completed);
+		EndQuest(StageNode.QuestAsset, EQuestCompleteStatus::Completed);
 		return;
 	}
 	
 	for (FQuestItemNode& stage : Stages)
 	{
-		stage.SetStatus(EQuestCompleteStatus::Active);
+		stage.SetStatus(EQuestCompleteStatus::Active, this);
 	
 		if (stage.TryComplete(this))
 		{
-			if (ActiveQuests[Stage.OwnerQuest->GetFName()].Status != EQuestCompleteStatus::Active)
+			if (ActiveQuests[StageNode.QuestAsset->GetFName()].Status != EQuestCompleteStatus::Active)
 				break;
 		}
 	}
