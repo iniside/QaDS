@@ -22,5 +22,5 @@ class DIALOGSYSTEMRUNTIME_API IQuestInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	class UQuestComponent* GetQuestComponent() const = 0;
+	virtual class UQuestComponent* GetQuestComponent() const = 0;
 };

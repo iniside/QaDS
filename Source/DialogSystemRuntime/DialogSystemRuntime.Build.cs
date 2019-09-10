@@ -24,6 +24,7 @@ public class DialogSystemRuntime : ModuleRules
             {
                 "Core"
 				, "GameplayTags"
+				, "GameplayAbilities"
             }
         );
 

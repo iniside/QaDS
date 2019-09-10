@@ -7,11 +7,7 @@
 
 void UDialogPhraseNode::Invoke(UDialogProcessor* processor)
 {
-	check(processor);
-
-	processor->StoryKeyManager->AddKey(Data.GiveKeys);
-
-	processor->StoryKeyManager->RemoveKey(Data.RemoveKeys);
+	check(false);
 
 	for (auto& Event : Data.Action)
 		Event.Invoke(processor);

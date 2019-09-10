@@ -114,14 +114,14 @@ class DIALOGSYSTEMRUNTIME_API UQuestRuntimeNode : public UObject
 {
 	GENERATED_BODY()
 
-	TArray<UQuestRuntimeNode*> childCahe;
+	TArray<UQuestRuntimeNode*> ChildCache;
 
 	void Activate();
 	void Failed();
 	void Complete();
 	void Deactivate();
 
-	bool CkeckForActivate();
+	bool CkeckForActivate(class UQuestComponent* Owner);
 	bool CkeckForComplete();
 	bool CkeckForFailed();
 
@@ -146,7 +146,8 @@ public:
 
 	bool TryComplete();
 	void SetStatus(EQuestCompleteStatus NewStatus);
-	TArray<UQuestRuntimeNode*> GetNextStage();
+	
+	TArray<UQuestRuntimeNode*> GetNextStage(class UQuestComponent* Owner);
 
 private:
 	UFUNCTION()

@@ -13,18 +13,22 @@
 	"CanContainContent": false,
 	"IsBetaVersion": false,
 	"Installed": false,
-	"Modules" :
-	[
+	"Modules": [
 		{
-			"Name" : "DialogSystemRuntime",
-			"Type" : "Runtime",
-			"LoadingPhase" : "Default"
+			"Name": "DialogSystemRuntime",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
 		},
 		{
-			"Name" : "DialogSystemEditor",
-			"Type" : "Editor"
+			"Name": "DialogSystemEditor",
+			"Type": "Editor"
 		}
 	],
-
-	"CanContainContent" : true
+	"Plugins": [
+		{
+			"Name": "GameplayAbilities",
+			"Enabled": true
+		}
+	],
+	"CanContainContent": true
 }

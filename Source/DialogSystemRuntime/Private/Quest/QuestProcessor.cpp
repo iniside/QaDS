@@ -70,41 +70,42 @@ void UQuestProcessor::StartQuest(TAssetPtr<UQuestAsset> QuestAsset)
 
 void UQuestProcessor::WaitStage(UQuestRuntimeNode* StageNode)
 {
-	if (bIsResetBegin)
-		return;
-
-	if (StageNode == NULL)
-	{
-		UE_LOG(DialogModuleLog, Error, TEXT("Failed jump to null quest stage"));
-		return;
-	}
-
-	check(StageNode->OwnerQuest);
-
-	auto stages = StageNode->GetNextStage();
-	auto isOptionalOnly = true;
-
-	for (auto stage : stages)
-	{
-		isOptionalOnly &= stage->Stage.bIsOptional;
-	}
-
-	if (stages.Num() == 0 || isOptionalOnly)
-	{
-		EndQuest(StageNode->OwnerQuest, EQuestCompleteStatus::Completed);
-		return;
-	}
-
-	for (auto stage : stages)
-	{
-		stage->SetStatus(EQuestCompleteStatus::Active);
-
-		if (stage->TryComplete())
-		{
-			if (StageNode->OwnerQuest->Status != EQuestCompleteStatus::Active)
-				break;
-		}
-	}
+	check(false);
+	//if (bIsResetBegin)
+	//	return;
+	//
+	//if (StageNode == NULL)
+	//{
+	//	UE_LOG(DialogModuleLog, Error, TEXT("Failed jump to null quest stage"));
+	//	return;
+	//}
+	//
+	//check(StageNode->OwnerQuest);
+	//
+	//auto stages = StageNode->GetNextStage();
+	//auto isOptionalOnly = true;
+	//
+	//for (auto stage : stages)
+	//{
+	//	isOptionalOnly &= stage->Stage.bIsOptional;
+	//}
+	//
+	//if (stages.Num() == 0 || isOptionalOnly)
+	//{
+	//	EndQuest(StageNode->OwnerQuest, EQuestCompleteStatus::Completed);
+	//	return;
+	//}
+	//
+	//for (auto stage : stages)
+	//{
+	//	stage->SetStatus(EQuestCompleteStatus::Active);
+	//
+	//	if (stage->TryComplete())
+	//	{
+	//		if (StageNode->OwnerQuest->Status != EQuestCompleteStatus::Active)
+	//			break;
+	//	}
+	//}
 }
 
 void UQuestProcessor::CompleteStage(UQuestRuntimeNode* StageNode)

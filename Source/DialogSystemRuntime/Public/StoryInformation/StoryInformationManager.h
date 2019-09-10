@@ -43,12 +43,6 @@ public:
 	bool DontHasKey(const FGameplayTagContainer& Key) const;
 
 	UFUNCTION(BlueprintCallable, Category = "Gameplay|StoryKey")
-	bool AddKey(const FGameplayTagContainer& Key);
-
-	UFUNCTION(BlueprintCallable, Category = "Gameplay|StoryKey")
-	bool RemoveKey(const FGameplayTagContainer& Key);
-
-	UFUNCTION(BlueprintCallable, Category = "Gameplay|StoryKey")
 	void Reset();
 
 	UFUNCTION(BlueprintCallable, Category = "Gameplay|StoryKey")

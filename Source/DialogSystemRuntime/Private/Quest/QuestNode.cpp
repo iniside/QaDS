@@ -4,19 +4,19 @@
 #include "QuestProcessor.h"
 #include "StoryInformationManager.h"
 
-TArray<UQuestRuntimeNode*> UQuestRuntimeNode::GetNextStage()
+TArray<UQuestRuntimeNode*> UQuestRuntimeNode::GetNextStage(class UQuestComponent* Owner)
 {
-	if (childCahe.Num() == 0)
+	if (ChildCache.Num() == 0)
 	{
 		for (auto child : Childs)
 		{
-			childCahe.Add(OwnerQuest->LoadNode(child));
+			ChildCache.Add(OwnerQuest->LoadNode(child));
 		}
 	}
 
-	return childCahe.FilterByPredicate([=](UQuestRuntimeNode* node)
+	return ChildCache.FilterByPredicate([=](UQuestRuntimeNode* node)
 	{
-		return node->CkeckForActivate();
+		return node->CkeckForActivate(Owner);
 	});
 }
 
@@ -140,10 +140,6 @@ void UQuestRuntimeNode::Complete()
 		Processor->EndQuest(OwnerQuest, Stage.ChangeQuestState);
 	}
 
-	Processor->StoryKeyManager->AddKey(Stage.GiveKeys);
-
-	Processor->StoryKeyManager->RemoveKey(Stage.RemoveKeys);
-
 	for (auto& Event : Stage.Action)
 		Event.Invoke(this);
 }
@@ -195,7 +191,7 @@ bool UQuestRuntimeNode::MatchTringgerParam(const FString& value, const FString& 
 	return false;
 }
 
-bool UQuestRuntimeNode::CkeckForActivate()
+bool UQuestRuntimeNode::CkeckForActivate(class UQuestComponent* Owner)
 {
 	unimplemented();
 	if (Processor->StoryKeyManager->DontHasKey(Stage.CheckHasKeys))

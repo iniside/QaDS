@@ -44,12 +44,7 @@ void AStoryVolume::Activate()
 
 	if (RemoveKeys.Num() + GiveKeys.Num() > 0)
 	{
-		auto skm = UStoryKeyManager::GetStoryKeyManager(this);
-
-		skm->AddKey(GiveKeys);
-		
-		skm->RemoveKey(RemoveKeys);
-	
+		auto skm = UStoryKeyManager::GetStoryKeyManager(this);	
 	}
 	
 	if (ActivateTriggers.Num() > 0)

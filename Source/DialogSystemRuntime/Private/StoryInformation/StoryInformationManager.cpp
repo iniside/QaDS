@@ -4,6 +4,7 @@
 #include "StoryInformationManager.h"
 #include "Serialization/MemoryWriter.h"
 #include "Serialization/MemoryReader.h"
+#include "GameplayTagsManager.h"
 
 UStoryKeyManager* UStoryKeyManager::Instance = NULL;
 
@@ -35,41 +36,33 @@ void UStoryKeyManager::BeginDestroy()
 
 bool UStoryKeyManager::HasKey(const FGameplayTagContainer& Key) const
 {
-	unimplemented();
+	UGameplayTagsManager& GTM = UGameplayTagsManager::Get();
+
+	for(const FGameplayTag& Tag : Key)
+	{
+		TSharedPtr<FGameplayTagNode> TagNode = GTM.FindTagNode(Tag);
+		if(!TagNode.IsValid())
+		{
+			return false;
+		}
+	}
+	
 	return false;
 }
 
 bool UStoryKeyManager::DontHasKey(const FGameplayTagContainer& Key) const
 {
-	unimplemented();
+	UGameplayTagsManager& GTM = UGameplayTagsManager::Get();
+
+	for (const FGameplayTag& Tag : Key)
+	{
+		TSharedPtr<FGameplayTagNode> TagNode = GTM.FindTagNode(Tag);
+		if (TagNode.IsValid())
+		{
+			return true;
+		}
+	}
 	return false;
-}
-
-bool UStoryKeyManager::AddKey(const FGameplayTagContainer& Key)
-{
-	unimplemented();
-	//if (Database.Contains(Key))
-	//	return false;
-	//
-	//Database.Add(Key);
-	//OnKeyAdd.Broadcast(Key);
-	//OnKeyAddBP.Broadcast(Key);
-
-	UE_LOG(DialogModuleLog, Log, TEXT("Add key '%s' to storage"), *Key.ToString());
-	return true;
-}
-
-bool UStoryKeyManager::RemoveKey(const FGameplayTagContainer& Key)
-{
-	unimplemented();
-	//if (!Database.Remove(Key))
-	//	return false;
-	//
-	//OnKeyRemove.Broadcast(Key);
-	//OnKeyRemoveBP.Broadcast(Key);
-
-	UE_LOG(DialogModuleLog, Log, TEXT("Remove key '%s' from storage"), *Key.ToString());
-	return true;
 }
 
 TArray<FName> UStoryKeyManager::GetKeys() const
