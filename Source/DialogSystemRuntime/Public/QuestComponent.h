@@ -28,7 +28,7 @@ public:
 	TArray<FGuid> Childs;
 
 	UPROPERTY()
-	class UQuestAsset* QuestAsset;
+	TWeakObjectPtr<UQuestAsset> QuestAsset;
 
 	const FQuestStageInfo& GetStage() const
 	{
@@ -109,7 +109,13 @@ public:
 	AQuestScript* Script;
 
 	UPROPERTY(BlueprintReadOnly)
-	UQuestAsset* Asset;
+	TWeakObjectPtr<UQuestAsset> Asset;
+
+	FQuestItem()
+		: Status(EQuestCompleteStatus::None)
+		, Script(nullptr)
+		, Asset(nullptr)
+	{}
 
 	FQuestItemNode LoadNode(FGuid Uid)
 	{
@@ -150,6 +156,16 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	bool HasAllTags(const FGameplayTagContainer& InTags) const
+	{
+		return QuestTags.HasAll(InTags);
+	}
+
+	bool NotHaveAllTags(const FGameplayTagContainer& InTags) const
+	{
+		return !QuestTags.HasAll(InTags);
+	}
 
 	UFUNCTION(BlueprintCallable, Category = "Gameplay|Quest")
 	void StartQuest(TAssetPtr<UQuestAsset> QuestAsset);

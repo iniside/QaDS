@@ -122,10 +122,10 @@ bool FQuestStageCondition::Compile(UQuestAsset* Quest, FString& ErrorMessage)
 	return true;
 }
 
-UObject* FQuestStageEvent::GetObject(struct FQuestItemNode* QuestNode, class UQuestComponent* InQC) const
+UObject* FQuestStageEvent::GetObject(const struct FQuestItemNode* QuestNode, class UQuestComponent* InQC) const
 {
 	UObject* obj = nullptr;
-	FQuestItem& quest = QuestNode->GetOwner(InQC);
+	FQuestItem& quest = const_cast<FQuestItemNode*>(QuestNode)->GetOwner(InQC);
 
 	switch (CallType)
 	{
@@ -179,7 +179,7 @@ UObject* FQuestStageEvent::GetObject(struct FQuestItemNode* QuestNode, class UQu
 	return obj;
 }
 
-void FQuestStageEvent::Invoke(struct FQuestItemNode* QuestNode, class UQuestComponent* InQC)
+void FQuestStageEvent::Invoke(const struct FQuestItemNode* QuestNode, class UQuestComponent* InQC)
 {
 	UObject* obj = GetObject(QuestNode, InQC);
 	if (obj != nullptr)
@@ -222,7 +222,7 @@ FString FQuestStageEvent::ToString() const
 	return TEXT("None");
 }
 
-bool FQuestStageCondition::InvokeCheck(struct FQuestItemNode* QuestNode, class UQuestComponent* InQC) const
+bool FQuestStageCondition::InvokeCheck(const struct FQuestItemNode* QuestNode, class UQuestComponent* InQC) const
 {
 	auto obj = GetObject(QuestNode, InQC);
 

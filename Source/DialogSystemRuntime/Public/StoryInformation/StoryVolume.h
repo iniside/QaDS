@@ -39,5 +39,5 @@ public:
 	virtual bool CanActivate(class AActor* Other);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void Activate();
+	virtual void Activate(class AActor* Other);
 };

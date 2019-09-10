@@ -5,10 +5,12 @@
 #include "QuestProcessor.h"
 #include "QuestAsset.h"
 #include "GameFramework/Pawn.h"
+#include "QuestInterface.h"
+#include "QuestComponent.h"
 
 bool AStoryVolume::CanActivate(AActor* Other)
 {
-	unimplemented();
+
 	if (CheckHasKeys.Num() + CheckDontHasKeys.Num() > 0)
 	{
 		auto skm = UStoryKeyManager::GetStoryKeyManager(this);
@@ -32,34 +34,30 @@ void AStoryVolume::ActorEnteredVolume(AActor* Other)
 
 	if (playerCharacter != NULL && Other == playerCharacter)
 	{
-		if (CanActivate(Other))
-			Activate();
+		//if (CanActivate(Other))
+			Activate(Other);
 	}
 }
 
-void AStoryVolume::Activate()
+void AStoryVolume::Activate(AActor* Other)
 {
-	unimplemented();
 	UE_LOG(DialogModuleLog, Log, TEXT("Activate story volume %s"), *GetFName().ToString());
 
-	if (RemoveKeys.Num() + GiveKeys.Num() > 0)
-	{
-		auto skm = UStoryKeyManager::GetStoryKeyManager(this);	
-	}
-	
-	if (ActivateTriggers.Num() > 0)
-	{
-		auto stm = UStoryTriggerManager::GetStoryTriggerManager(this);
-		for (auto& trigger : ActivateTriggers)
-		{
-			stm->InvokeTrigger(trigger);
-		}
-	}
+	IQuestInterface* QI = Cast<IQuestInterface>(Other);
+	UQuestComponent* QE = QI->GetQuestComponent();
+
+	//if (ActivateTriggers.Num() > 0)
+	//{
+	//	auto stm = UStoryTriggerManager::GetStoryTriggerManager(this);
+	//	for (auto& trigger : ActivateTriggers)
+	//	{
+	//		stm->InvokeTrigger(trigger);
+	//	}
+	//}
 
 	if (!StartQuest.IsNull())
 	{
-		auto questProcesstor = UQuestProcessor::GetQuestProcessor(this);
-		questProcesstor->StartQuest(StartQuest);
+		QE->StartQuest(StartQuest);
 	}
 
 	if (bDestroySelf)

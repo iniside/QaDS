@@ -135,7 +135,7 @@ FGuid FQuestAssetEditor::Compile(UQaDSEdGraphNode* node)
 	if (stageNode != NULL)
 	{
 		stageNode->Stage.UID = node->NodeGuid;
-		FQuestStageInfo& stage = stageNode->Stage;
+		FQuestStageInfo stage = stageNode->Stage;
 		stage.UID = node->NodeGuid;
 
 		FString ErrorMessage;
@@ -171,6 +171,12 @@ FGuid FQuestAssetEditor::Compile(UQaDSEdGraphNode* node)
 			}
 		}
 
+		EditedAsset->Nodes.Add(node->NodeGuid, stage);
+	}
+	else if(UQuestRootEdGraphNode* root = Cast<UQuestRootEdGraphNode>(node))
+	{
+		FQuestStageInfo stage;
+		stage.UID = node->NodeGuid;
 		EditedAsset->Nodes.Add(node->NodeGuid, stage);
 	}
 
