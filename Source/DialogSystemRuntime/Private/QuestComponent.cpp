@@ -5,6 +5,7 @@
 #include "QuestAsset.h"
 #include "ObjectKey.h"
 #include "QaDSSettings.h"
+#include "QuestScript.h"
 
 FQuestItem& FQuestItemNode::GetOwner(UQuestComponent* Owner)
 {
@@ -13,6 +14,7 @@ FQuestItem& FQuestItemNode::GetOwner(UQuestComponent* Owner)
 
 bool FQuestItemNode::CkeckForActivate(UQuestComponent* Owner) const
 {
+	UE_LOG(DialogModuleLog, Log, TEXT("CkeckForActivate %s Quest %s"), *GetStage().Caption.ToString(), *QuestAsset->GetName());
 	if(Owner->QuestTags.Num() > 0)
 	{
 		if (!Owner->QuestTags.HasAll(GetStage().CheckHasKeys))
@@ -29,8 +31,8 @@ bool FQuestItemNode::CkeckForActivate(UQuestComponent* Owner) const
 	
 	for (auto& Conditions : Predicates)
 	{
-		//if (!Conditions.InvokeCheck(this, Owner))
-		//	return false;
+		if (!Conditions.InvokeCheck(this, Owner))
+			return false;
 	}
 
 	return true;
@@ -301,8 +303,8 @@ void UQuestComponent::WaitStage(FQuestItemNode& StageNode)
 	check(StageNode.QuestAsset.Get());
 
 	const FQuestStageInfo& Stage = StageNode.GetStage();
-	
-	auto Stages = StageNode.GetNextStage(this);
+
+	TArray<FQuestItemNode> Stages = StageNode.GetNextStage(this);
 	auto bIsOptionalOnly = true;
 	
 	for (const FQuestItemNode& stage : Stages)
@@ -319,9 +321,15 @@ void UQuestComponent::WaitStage(FQuestItemNode& StageNode)
 	for (FQuestItemNode& stage : Stages)
 	{
 		stage.SetStatus(EQuestCompleteStatus::Active, this);
-	
+		UE_LOG(DialogModuleLog, Log, TEXT("WaitStage %s Quest %s"), *stage.GetStage().Caption.ToString(), *stage.QuestAsset->GetName());
+		if(!ActiveQuests.Contains(StageNode.QuestAsset->GetFName()))
+		{
+			return;
+		}
+
 		if (stage.TryComplete(this))
 		{
+			UE_LOG(DialogModuleLog, Log, TEXT("Stage %s Completed"), *stage.GetStage().Caption.ToString());
 			if (ActiveQuests[StageNode.QuestAsset->GetFName()].Status != EQuestCompleteStatus::Active)
 				break;
 		}
@@ -330,6 +338,32 @@ void UQuestComponent::WaitStage(FQuestItemNode& StageNode)
 
 void UQuestComponent::EndQuest(UQuestAsset* Quest, EQuestCompleteStatus QuestStatus)
 {
+	//if (bIsResetBegin)
+	//	return;
+
+	FQuestItem QuestRoot;
+	bool bSuccess = ActiveQuests.RemoveAndCopyValue(Quest->GetFName(), QuestRoot);
+
+	if (!bSuccess)
+	{
+		UE_LOG(DialogModuleLog, Warning, TEXT("Failed end quest: quest is not active (%s)"), *Quest->GetFName().ToString());
+		return;
+	}
+
+	UE_LOG(DialogModuleLog, Log, TEXT("Ended : %s : Quest"), *Quest->GetFName().ToString());
+
+	if (QuestRoot.Status == EQuestCompleteStatus::Active)
+	{
+		QuestRoot.Status = QuestStatus;
+	}
+
+	if (GetDefault<UQaDSSettings>()->bUseQuestArchive)
+	{
+		SucceededQuests.Add(Quest);
+	}
+
+	//OnQuestEnd.Broadcast(Quest, Status);
+	QuestRoot.Script->Destroy();
 }
 
 TArray<UQuestRuntimeAsset*> UQuestComponent::GetQuests(EQuestCompleteStatus FilterStatus) const
