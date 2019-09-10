@@ -49,17 +49,13 @@ TArray<UDialogPhraseNode*> UDialogElseIfNode::GetNextPhrases(UDialogProcessor* p
 
 bool FDialogElseIfCondition::Check(UDialogProcessor* processor)
 {
-	for (auto& key : CheckHasKeys)
-	{
-		if (processor->StoryKeyManager->DontHasKey(key))
-			return false;
-	}
+	unimplemented();
+	if (processor->StoryKeyManager->DontHasKey(CheckHasKeys))
+		return false;
+	
 
-	for (auto& key : CheckDontHasKeys)
-	{
-		if (processor->StoryKeyManager->HasKey(key))
-			return false;
-	}
+	if (processor->StoryKeyManager->HasKey(CheckDontHasKeys))
+		return false;
 
 	for (auto& predicate : Predicate)
 	{

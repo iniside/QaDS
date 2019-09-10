@@ -22,7 +22,8 @@ public class DialogSystemRuntime : ModuleRules
         PublicDependencyModuleNames.AddRange(
             new string[]
             {
-                "Core",
+                "Core"
+				, "GameplayTags"
             }
         );
 
@@ -30,10 +31,10 @@ public class DialogSystemRuntime : ModuleRules
         PrivateDependencyModuleNames.AddRange(
             new string[]
             {
-                "CoreUObject",
-                "Engine",
-                "Slate",
-                "SlateCore",
+                "CoreUObject"
+                , "Engine"
+                , "Slate"
+                , "SlateCore"
             }
         );
 

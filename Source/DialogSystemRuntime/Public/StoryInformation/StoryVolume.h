@@ -3,10 +3,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PhysicsVolume.h"
 #include "StoryTriggerManager.h"
-#include "StrotyVolume.generated.h"
+#include "GameplayTagContainer.h"
+#include "StoryVolume.generated.h"
 
 UCLASS()
-class DIALOGSYSTEMRUNTIME_API AStrotyVolume : public APhysicsVolume
+class DIALOGSYSTEMRUNTIME_API AStoryVolume : public APhysicsVolume
 {
 	GENERATED_BODY()
 
@@ -14,16 +15,16 @@ class DIALOGSYSTEMRUNTIME_API AStrotyVolume : public APhysicsVolume
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Conditions")
-	TArray<FName> CheckHasKeys;
+	FGameplayTagContainer CheckHasKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Conditions")
-	TArray<FName> CheckDontHasKeys;
+	FGameplayTagContainer CheckDontHasKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Activate")
-	TArray<FName> GiveKeys;
+	FGameplayTagContainer GiveKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Activate")
-	TArray<FName> RemoveKeys;
+	FGameplayTagContainer RemoveKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Activate")
 	TArray<FStoryTrigger> ActivateTriggers;

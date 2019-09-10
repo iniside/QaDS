@@ -106,10 +106,11 @@ public:
 	template<typename T>
 	FORCEINLINE void TryGet(const FString& tag, T& outValue) const
 	{
-		auto xml = XmlNode->FindChildNode(tag);
-
-		if (xml != NULL)
-			FXmlReadNode(xml) >> outValue;
+		unimplemented();
+		//auto xml = XmlNode->FindChildNode(tag);
+		//
+		//if (xml != NULL)
+		//	FXmlReadNode(xml) >> outValue;
 	}
 
 	template<typename T>

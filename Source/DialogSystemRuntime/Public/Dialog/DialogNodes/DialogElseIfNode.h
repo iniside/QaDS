@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DialogNode.h"
+#include "GameplayTagContainer.h"
 #include "DialogElseIfNode.generated.h"
 
 USTRUCT(BlueprintType)
@@ -9,10 +10,10 @@ struct DIALOGSYSTEMRUNTIME_API FDialogElseIfCondition
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Conditions")
-	TArray<FName> CheckHasKeys;
+	FGameplayTagContainer CheckHasKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Conditions")
-	TArray<FName> CheckDontHasKeys;
+	FGameplayTagContainer CheckDontHasKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Conditions")
 	TArray<FDialogPhraseCondition> Predicate;

@@ -132,35 +132,35 @@ void SStoryKeyWindow::Tick(const FGeometry& AllottedGeometry, double InCurrentTi
 
 void SStoryKeyWindow::HandleSelectKey(TSharedPtr<FString> NewSelection, ESelectInfo::Type SelectInfo)
 {
-	if (NewSelection.IsValid())
-	{
-		editKeyTextBox->SetText(FText::FromString(*NewSelection));
-	}
+	//if (NewSelection.IsValid())
+	//{
+	//	editKeyTextBox->SetText(FText::FromString(*NewSelection));
+	//}
 }
 
 void SStoryKeyWindow::UpdateKeys()
 {
-	keys.Reset();
-
-	auto filter = searchBox->GetText().ToString();
-	auto keysRaw = keyManager->GetKeys();
-
-	keysRaw.Sort([](const FName& a, const FName& b)
-	{
-		return a.Compare(b) != INDEX_NONE;
-	});
-
-	for (auto key : keysRaw)
-	{
-		auto keyStr = key.ToString();
-
-		if (filter.IsEmpty() || keyStr.Contains(filter))
-		{
-			keys.Add(MakeShareable(new FString(keyStr)));
-		}
-	}
-	
-	keyListView->RebuildList();
+	//keys.Reset();
+	//
+	//auto filter = searchBox->GetText().ToString();
+	//auto keysRaw = keyManager->GetKeys();
+	//
+	//keysRaw.Sort([](const FName& a, const FName& b)
+	//{
+	//	return a.Compare(b) != INDEX_NONE;
+	//});
+	//
+	//for (auto key : keysRaw)
+	//{
+	//	auto keyStr = key.ToString();
+	//
+	//	if (filter.IsEmpty() || keyStr.Contains(filter))
+	//	{
+	//		keys.Add(MakeShareable(new FString(keyStr)));
+	//	}
+	//}
+	//
+	//keyListView->RebuildList();
 }
 
 FReply SStoryKeyWindow::HandleExportButton()
@@ -234,30 +234,30 @@ FReply SStoryKeyWindow::HandleImportButton()
 
 FReply SStoryKeyWindow::HandleAddKeyButton()
 {
-	auto key = editKeyTextBox->GetText().ToString();
-	if (keyManager->AddKey(*key))
-	{
-		editKeyTextBox->SetText(FText());
-	}
-	else
-	{
-		LogInfo("Already contains");
-	}
+	//auto key = editKeyTextBox->GetText().ToString();
+	//if (keyManager->AddKey(*key))
+	//{
+	//	editKeyTextBox->SetText(FText());
+	//}
+	//else
+	//{
+	//	LogInfo("Already contains");
+	//}
 
 	return FReply::Handled();
 }
 
 FReply SStoryKeyWindow::HandleRemoveKeyButton()
 {
-	auto key = editKeyTextBox->GetText().ToString();
-	if (keyManager->RemoveKey(*key))
-	{
-		editKeyTextBox->SetText(FText());
-	}
-	else
-	{
-		LogInfo("Key not found");
-	}
+	//auto key = editKeyTextBox->GetText().ToString();
+	//if (keyManager->RemoveKey(*key))
+	//{
+	//	editKeyTextBox->SetText(FText());
+	//}
+	//else
+	//{
+	//	LogInfo("Key not found");
+	//}
 
 	return FReply::Handled();
 }

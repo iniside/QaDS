@@ -33,36 +33,40 @@ void UStoryKeyManager::BeginDestroy()
 		Instance = NULL;
 }
 
-bool UStoryKeyManager::HasKey(FName Key) const
+bool UStoryKeyManager::HasKey(const FGameplayTagContainer& Key) const
 {
-	return Database.Contains(Key);
+	unimplemented();
+	return false;
 }
 
-bool UStoryKeyManager::DontHasKey(FName Key) const
+bool UStoryKeyManager::DontHasKey(const FGameplayTagContainer& Key) const
 {
-	return !Database.Contains(Key);
+	unimplemented();
+	return false;
 }
 
-bool UStoryKeyManager::AddKey(FName Key)
+bool UStoryKeyManager::AddKey(const FGameplayTagContainer& Key)
 {
-	if (Database.Contains(Key))
-		return false;
-
-	Database.Add(Key);
-	OnKeyAdd.Broadcast(Key);
-	OnKeyAddBP.Broadcast(Key);
+	unimplemented();
+	//if (Database.Contains(Key))
+	//	return false;
+	//
+	//Database.Add(Key);
+	//OnKeyAdd.Broadcast(Key);
+	//OnKeyAddBP.Broadcast(Key);
 
 	UE_LOG(DialogModuleLog, Log, TEXT("Add key '%s' to storage"), *Key.ToString());
 	return true;
 }
 
-bool UStoryKeyManager::RemoveKey(FName Key)
+bool UStoryKeyManager::RemoveKey(const FGameplayTagContainer& Key)
 {
-	if (!Database.Remove(Key))
-		return false;
-
-	OnKeyRemove.Broadcast(Key);
-	OnKeyRemoveBP.Broadcast(Key);
+	unimplemented();
+	//if (!Database.Remove(Key))
+	//	return false;
+	//
+	//OnKeyRemove.Broadcast(Key);
+	//OnKeyRemoveBP.Broadcast(Key);
 
 	UE_LOG(DialogModuleLog, Log, TEXT("Remove key '%s' from storage"), *Key.ToString());
 	return true;

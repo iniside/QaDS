@@ -22,13 +22,14 @@ TArray<UQuestRuntimeNode*> UQuestRuntimeNode::GetNextStage()
 
 void UQuestRuntimeNode::OnChangeStoryKey(const FName& key)
 {
-	if (Stage.WaitHasKeys.Contains(key)		 ||
-		Stage.WaitDontHasKeys.Contains(key)  ||
-		Stage.FailedIfGiveKeys.Contains(key) ||
-		Stage.FailedIfRemoveKeys.Contains(key))
-	{
-		TryComplete();
-	}
+	unimplemented();
+	//if (Stage.WaitHasKeys.Contains(key)		 ||
+	//	Stage.WaitDontHasKeys.Contains(key)  ||
+	//	Stage.FailedIfGiveKeys.Contains(key) ||
+	//	Stage.FailedIfRemoveKeys.Contains(key))
+	//{
+	//	TryComplete();
+	//}
 }
 
 void UQuestRuntimeNode::OnTrigger(const FStoryTrigger& Trigger)
@@ -139,11 +140,9 @@ void UQuestRuntimeNode::Complete()
 		Processor->EndQuest(OwnerQuest, Stage.ChangeQuestState);
 	}
 
-	for (auto key : Stage.GiveKeys)
-		Processor->StoryKeyManager->AddKey(key);
+	Processor->StoryKeyManager->AddKey(Stage.GiveKeys);
 
-	for (auto key : Stage.RemoveKeys)
-		Processor->StoryKeyManager->RemoveKey(key);
+	Processor->StoryKeyManager->RemoveKey(Stage.RemoveKeys);
 
 	for (auto& Event : Stage.Action)
 		Event.Invoke(this);
@@ -198,17 +197,12 @@ bool UQuestRuntimeNode::MatchTringgerParam(const FString& value, const FString& 
 
 bool UQuestRuntimeNode::CkeckForActivate()
 {
-	for (auto key : Stage.CheckHasKeys)
-	{
-		if (Processor->StoryKeyManager->DontHasKey(key))
-			return false;
-	}
-
-	for (auto key : Stage.CheckDontHasKeys)
-	{
-		if (Processor->StoryKeyManager->HasKey(key))
-			return false;
-	}
+	unimplemented();
+	if (Processor->StoryKeyManager->DontHasKey(Stage.CheckHasKeys))
+		return false;
+	
+	if (Processor->StoryKeyManager->HasKey(Stage.CheckDontHasKeys))
+		return false;
 
 	for (auto& Conditions : Stage.Predicate)
 	{
@@ -221,23 +215,18 @@ bool UQuestRuntimeNode::CkeckForActivate()
 
 bool UQuestRuntimeNode::CkeckForComplete()
 {
+	unimplemented();
 	for (auto& cond : Stage.WaitTriggers)
 	{
 		if (cond.TotalCount != 0)
 			return false;
 	}
 
-	for (auto key : Stage.WaitHasKeys)
-	{
-		if (Processor->StoryKeyManager->DontHasKey(key))
-			return false;
-	}
-
-	for (auto key : Stage.WaitDontHasKeys)
-	{
-		if (Processor->StoryKeyManager->HasKey(key))
-			return false;
-	}
+	if (Processor->StoryKeyManager->DontHasKey(Stage.WaitHasKeys))
+		return false;
+	
+	if (Processor->StoryKeyManager->HasKey(Stage.WaitDontHasKeys))
+		return false;
 
 	for (auto& Conditions : Stage.WaitPredicate)
 	{
@@ -250,23 +239,20 @@ bool UQuestRuntimeNode::CkeckForComplete()
 
 bool UQuestRuntimeNode::CkeckForFailed()
 {
+	unimplemented();
 	for (auto& cond : Stage.FailedTriggers)
 	{
 		if (cond.TotalCount == 0)
 			return true;
 	}
 
-	for (auto key : Stage.FailedIfGiveKeys)
-	{
-		if (Processor->StoryKeyManager->HasKey(key))
-			return true;
-	}
+	if (Processor->StoryKeyManager->HasKey(Stage.FailedIfGiveKeys))
+		return true;
 
-	for (auto key : Stage.FailedIfRemoveKeys)
-	{
-		if (Processor->StoryKeyManager->DontHasKey(key))
-			return true;
-	}
+	
+	if (Processor->StoryKeyManager->DontHasKey(Stage.FailedIfRemoveKeys))
+		return true;
+	
 
 	for (auto& Conditions : Stage.FailedPredicate)
 	{

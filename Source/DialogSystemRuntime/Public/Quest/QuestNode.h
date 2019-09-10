@@ -2,6 +2,7 @@
 
 #include "QuestStageEvent.h"
 #include "StoryTriggerManager.h"
+#include "GameplayTagContainer.h"
 #include "QuestNode.generated.h"
 
 UENUM(BlueprintType)
@@ -57,19 +58,19 @@ struct DIALOGSYSTEMRUNTIME_API FQuestStageInfo
 	bool bGenerateEvents = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Conditions")
-	TArray<FName> CheckHasKeys;
+	FGameplayTagContainer CheckHasKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Conditions")
-	TArray<FName> CheckDontHasKeys;
+	FGameplayTagContainer CheckDontHasKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Conditions")
 	TArray<FQuestStageCondition> Predicate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Task")
-	TArray<FName> WaitHasKeys;
+	FGameplayTagContainer WaitHasKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Task")
-	TArray<FName> WaitDontHasKeys;
+	FGameplayTagContainer WaitDontHasKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Task")
 	TArray<FStoryTriggerCondition> WaitTriggers;
@@ -78,10 +79,10 @@ struct DIALOGSYSTEMRUNTIME_API FQuestStageInfo
 	TArray<FQuestStageCondition> WaitPredicate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Failed")
-	TArray<FName> FailedIfGiveKeys;
+	FGameplayTagContainer FailedIfGiveKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Failed")
-	TArray<FName> FailedIfRemoveKeys;
+	FGameplayTagContainer FailedIfRemoveKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Failed")
 	TArray<FStoryTriggerCondition> FailedTriggers;
@@ -93,10 +94,10 @@ struct DIALOGSYSTEMRUNTIME_API FQuestStageInfo
 	bool bFailedQuest = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Complete")
-	TArray<FName> GiveKeys;
+	FGameplayTagContainer GiveKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Complete")
-	TArray<FName> RemoveKeys;
+	FGameplayTagContainer RemoveKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Complete")
 	TArray<FQuestStageEvent> Action;

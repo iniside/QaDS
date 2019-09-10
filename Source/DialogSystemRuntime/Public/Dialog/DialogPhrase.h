@@ -5,6 +5,7 @@
 #include "UObject/NoExportTypes.h"
 #include "Runtime/Engine/Classes/Sound/SoundBase.h"
 #include "DialogPhraseEvent.h"
+#include "GameplayTagContainer.h"
 #include "DialogPhrase.generated.h"
 
 class UDialogNode;
@@ -64,19 +65,19 @@ struct DIALOGSYSTEMRUNTIME_API FDialogPhraseInfo
 	TMap<FName, FString> AditionalData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Conditions")
-	TArray<FName> CheckHasKeys;
+	FGameplayTagContainer CheckHasKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Conditions")
-	TArray<FName> CheckDontHasKeys;
+	FGameplayTagContainer CheckDontHasKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Conditions")
 	TArray<FDialogPhraseCondition> Predicate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Activate")
-	TArray<FName> GiveKeys;
+	FGameplayTagContainer GiveKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Activate")
-	TArray<FName> RemoveKeys;
+	FGameplayTagContainer RemoveKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Activate")
 	TArray<FDialogPhraseEvent> Action;

@@ -1,34 +1,30 @@
 #include "DialogSystemRuntime.h"
-#include "StrotyVolume.h"
+#include "StoryVolume.h"
 #include "StoryInformationManager.h"
 #include "StoryTriggerManager.h"
 #include "QuestProcessor.h"
 #include "QuestAsset.h"
 #include "GameFramework/Pawn.h"
 
-bool AStrotyVolume::CanActivate(AActor* Other)
+bool AStoryVolume::CanActivate(AActor* Other)
 {
+	unimplemented();
 	if (CheckHasKeys.Num() + CheckDontHasKeys.Num() > 0)
 	{
 		auto skm = UStoryKeyManager::GetStoryKeyManager(this);
 
-		for (auto& key : CheckHasKeys)
-		{
-			if (skm->DontHasKey(key))
-				return false;
-		}
-
-		for (auto& key : CheckDontHasKeys)
-		{
-			if (skm->HasKey(key))
-				return false;
-		}
+		if (skm->DontHasKey(CheckHasKeys))
+			return false;
+		
+		if (skm->HasKey(CheckDontHasKeys))
+			return false;
+		
 	}
 
 	return true;
 }
 
-void AStrotyVolume::ActorEnteredVolume(AActor* Other)
+void AStoryVolume::ActorEnteredVolume(AActor* Other)
 {
 	Super::ActorEnteredVolume(Other);
 
@@ -41,23 +37,19 @@ void AStrotyVolume::ActorEnteredVolume(AActor* Other)
 	}
 }
 
-void AStrotyVolume::Activate()
+void AStoryVolume::Activate()
 {
+	unimplemented();
 	UE_LOG(DialogModuleLog, Log, TEXT("Activate story volume %s"), *GetFName().ToString());
 
 	if (RemoveKeys.Num() + GiveKeys.Num() > 0)
 	{
 		auto skm = UStoryKeyManager::GetStoryKeyManager(this);
 
-		for (auto& key : GiveKeys)
-		{
-			skm->AddKey(key);
-		}
-
-		for (auto& key : RemoveKeys)
-		{
-			skm->RemoveKey(key);
-		}
+		skm->AddKey(GiveKeys);
+		
+		skm->RemoveKey(RemoveKeys);
+	
 	}
 	
 	if (ActivateTriggers.Num() > 0)

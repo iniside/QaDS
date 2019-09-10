@@ -21,8 +21,9 @@ public class DialogSystemEditor : ModuleRules
         PublicDependencyModuleNames.AddRange(
             new string[]
             {
-                "Core",
-                "TargetPlatform",
+                "Core"
+                , "TargetPlatform"
+				, "GameplayTags"
             }
         );
 

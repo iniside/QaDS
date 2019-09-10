@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EngineUtils.h"
+#include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
 #include "StoryInformationManager.generated.h"
 
@@ -36,16 +37,16 @@ public:
 	static UStoryKeyManager* GetStoryKeyManager(UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintPure, Category = "Gameplay|StoryKey")
-	bool HasKey(FName Key) const;
+	bool HasKey(const FGameplayTagContainer& Key) const;
 
 	UFUNCTION(BlueprintPure, Category = "Gameplay|StoryKey")
-	bool DontHasKey(FName Key) const;
+	bool DontHasKey(const FGameplayTagContainer& Key) const;
 
 	UFUNCTION(BlueprintCallable, Category = "Gameplay|StoryKey")
-	bool AddKey(FName Key);
+	bool AddKey(const FGameplayTagContainer& Key);
 
 	UFUNCTION(BlueprintCallable, Category = "Gameplay|StoryKey")
-	bool RemoveKey(FName Key);
+	bool RemoveKey(const FGameplayTagContainer& Key);
 
 	UFUNCTION(BlueprintCallable, Category = "Gameplay|StoryKey")
 	void Reset();

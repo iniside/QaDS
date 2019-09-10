@@ -9,11 +9,9 @@ void UDialogPhraseNode::Invoke(UDialogProcessor* processor)
 {
 	check(processor);
 
-	for (auto key : Data.GiveKeys)
-		processor->StoryKeyManager->AddKey(key);
+	processor->StoryKeyManager->AddKey(Data.GiveKeys);
 
-	for (auto key : Data.RemoveKeys)
-		processor->StoryKeyManager->RemoveKey(key);
+	processor->StoryKeyManager->RemoveKey(Data.RemoveKeys);
 
 	for (auto& Event : Data.Action)
 		Event.Invoke(processor);
@@ -55,19 +53,13 @@ void UDialogPhraseNode::Invoke(UDialogProcessor* processor)
 
 bool UDialogPhraseNode::Check(UDialogProcessor* processor)
 {
-	check(processor);
+	unimplemented();
 
-	for (auto key : Data.CheckHasKeys)
-	{
-		if (processor->StoryKeyManager->DontHasKey(key))
-			return false;
-	}
-
-	for (auto key : Data.CheckDontHasKeys)
-	{
-		if (processor->StoryKeyManager->HasKey(key))
-			return false;
-	}
+	if (processor->StoryKeyManager->DontHasKey(Data.CheckHasKeys))
+		return false;
+	
+	if (processor->StoryKeyManager->HasKey(Data.CheckDontHasKeys))
+		return false;
 
 	for (auto& Conditions : Data.Predicate)
 	{

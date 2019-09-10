@@ -31,26 +31,28 @@ FText UDialogPhraseEdGraphNode::GetNodeTitle(ENodeTitleType::Type TitleType) con
 
 FXmlWriteNode UDialogPhraseEdGraphNode::SaveToXml() const
 {
-	auto node = Super::SaveToXml();
-
-	node.Append("text", Data.Text.ToString());
-	node.Append("source", (int)Data.Source);
-
-	if (!Data.AutoTime)
-		node.Append("time", Data.PhraseManualTime);
-
-	if (Data.StartQuest.IsValid())
-		node.Append("quest", Data.StartQuest.ToSoftObjectPath().ToString());
-
-	node.Append("aditionals", Data.AditionalData);
-	node.Append("give_keys", Data.GiveKeys);
-	node.Append("remove_keys", Data.RemoveKeys);
-	node.Append("check_has_keys", Data.CheckHasKeys);
-	node.Append("check_dont_has_keys", Data.CheckDontHasKeys);
-	node.Append("actions", Data.Action);
-	node.Append("predicates", Data.Predicate);
-	
-	return node;
+	check(false);
+	return FXmlWriteNode();
+	//auto node = Super::SaveToXml();
+	//
+	//node.Append("text", Data.Text.ToString());
+	//node.Append("source", (int)Data.Source);
+	//
+	//if (!Data.AutoTime)
+	//	node.Append("time", Data.PhraseManualTime);
+	//
+	//if (Data.StartQuest.IsValid())
+	//	node.Append("quest", Data.StartQuest.ToSoftObjectPath().ToString());
+	//
+	//node.Append("aditionals", Data.AditionalData);
+	//node.Append("give_keys", Data.GiveKeys);
+	//node.Append("remove_keys", Data.RemoveKeys);
+	//node.Append("check_has_keys", Data.CheckHasKeys);
+	//node.Append("check_dont_has_keys", Data.CheckDontHasKeys);
+	//node.Append("actions", Data.Action);
+	//node.Append("predicates", Data.Predicate);
+	//
+	//return node;
 }
 
 void UDialogPhraseEdGraphNode::LoadInXml(FXmlReadNode* reader, const TMap<FString, UQaDSEdGraphNode*>& nodeById)
