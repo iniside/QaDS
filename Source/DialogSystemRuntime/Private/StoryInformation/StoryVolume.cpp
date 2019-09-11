@@ -41,6 +41,10 @@ void AStoryVolume::ActorEnteredVolume(AActor* Other)
 
 void AStoryVolume::Activate(AActor* Other)
 {
+	if(!Other->HasAuthority())
+	{
+		return;
+	}
 	UE_LOG(DialogModuleLog, Log, TEXT("Activate story volume %s"), *GetFName().ToString());
 
 	IQuestInterface* QI = Cast<IQuestInterface>(Other);

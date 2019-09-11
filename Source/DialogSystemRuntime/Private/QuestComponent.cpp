@@ -6,6 +6,8 @@
 #include "ObjectKey.h"
 #include "QaDSSettings.h"
 #include "QuestScript.h"
+#include "SharedPointerInternals.h"
+#include "SharedPointerInternals.h"
 
 FQuestItem& FQuestItemNode::GetOwner(UQuestComponent* Owner)
 {
@@ -57,6 +59,7 @@ void FQuestItemNode::OnTrigger(const FStoryTrigger& Trigger)
 
 bool FQuestItemNode::MatchTringger(const FStoryTriggerCondition& condition, const FStoryTrigger& trigger)
 {
+	UE_LOG(DialogModuleLog, Log, TEXT("MatchTringger Condition : %s : Trigger : %s : Quest : %s :"), *condition.ToString(), *trigger.TriggerName.ToString(), *QuestAsset->GetName());
 	if (condition.TriggerName != trigger.TriggerName)
 		return false;
 
@@ -71,7 +74,7 @@ bool FQuestItemNode::MatchTringger(const FStoryTriggerCondition& condition, cons
 			return false;
 	}
 
-	check(false);
+	//check(false);
 	//condition.TotalCount -= trigger.Count;
 
 	if (condition.TotalCount <= 0)
@@ -126,7 +129,7 @@ void FQuestItemNode::Activate(UQuestComponent* Owner)
 	
 	if (Stage.FailedTriggers.Num() > 0 || Stage.WaitTriggers.Num() > 0)
 	{
-	//	Processor->StoryTriggerManager->OnTriggerInvoke.AddDynamic(this, &UQuestRuntimeNode::OnTrigger);
+		Owner->OnTriggerInvoke.AddRaw(this, &FQuestItemNode::OnTrigger);
 	}
 }
 
@@ -168,7 +171,7 @@ void FQuestItemNode::Deactivate(UQuestComponent* Owner)
 	GetOwner(Owner).ActiveNodes.Remove(*this);
 	GetOwner(Owner).ArchiveNodes.Add(*this);
 	//
-	Owner->CompleteStage(*this);
+	Owner->CompleteStage(MakeShareable(this));
 	//
 	Owner->OnTagsAdded.Remove(TagsAddedHandle);
 	Owner->OnTagsRemoved.Remove(TagsRemovedHandle);
@@ -206,12 +209,16 @@ void FQuestItemNode::SetStatus(EQuestCompleteStatus NewStatus, UQuestComponent* 
 bool FQuestItemNode::CkeckForComplete(UQuestComponent* Owner)
 {
 	const FQuestStageInfo& Stage = GetStage();
-	//for (auto& cond : Stage.WaitTriggers)
-	//{
-	//	if (cond.TotalCount != 0)
-	//		return false;
-	//}
-	//
+	if(Stage.WaitTriggers.Num() > 0)
+	{
+		return false;
+	}
+	for (auto& cond : Stage.WaitTriggers)
+	{
+		if (cond.TotalCount != 0)
+			return false;
+	}
+	
 
 	if (Owner->QuestTags.Num() > 0)
 	{
@@ -221,25 +228,33 @@ bool FQuestItemNode::CkeckForComplete(UQuestComponent* Owner)
 		if (Owner->HasAllTags(Stage.WaitDontHasKeys))
 			return false;
 	}
-	
+
 	for (auto& Conditions : Stage.WaitPredicate)
 	{
 		if (!Conditions.InvokeCheck(this, Owner))
 			return false;
 	}
-	
+
+	if (Owner->QuestTags.Num() == 0)
+	{
+		return false;
+	}
 	return true;
 }
 
 bool FQuestItemNode::CkeckForFailed(UQuestComponent* Owner)
 {
-	//for (auto& cond : Stage.FailedTriggers)
-	//{
-	//	if (cond.TotalCount == 0)
-	//		return true;
-	//}
-	//
 	const FQuestStageInfo& Stage = GetStage();
+	if (Stage.WaitTriggers.Num() > 0)
+	{
+		return false;
+	}
+	for (auto& cond : Stage.FailedTriggers)
+	{
+		if (cond.TotalCount == 0)
+			return true;
+	}
+	
 	if(Owner->QuestTags.Num() > 0)
 	{
 		if (Owner->HasAllTags(Stage.FailedIfGiveKeys))
@@ -326,26 +341,27 @@ void UQuestComponent::StartQuest(TAssetPtr<UQuestAsset> QuestAsset)
 	TSubclassOf<AQuestScript> Cls = Quest->QuestScriptClass.LoadSynchronous();
 
 	StartNode.Script = GetWorld()->SpawnActor<AQuestScript>(Cls);
-
 	ActiveQuests.Add(Quest->GetFName(), StartNode);
 	//activeQuests.Add(runtimeQuest);
 	//OnQuestStart.Broadcast(runtimeQuest);
 
-	auto root = StartNode.LoadNode(Quest->RootNode, this);
+	auto root = ActiveQuests[QuestAsset->GetFName()].LoadNode(Quest->RootNode, this);
 	WaitStage(root);
+	
 }
 
-void UQuestComponent::CompleteStage(FQuestItemNode& StageNode)
+void UQuestComponent::CompleteStage(
+	TSharedPtr<FQuestItemNode> StageNode)
 {
 	//if (bIsResetBegin)
 	//	return;
 	
-	check(StageNode.QuestAsset.Get());
+	check(StageNode->QuestAsset.Get());
 
-	if (!ActiveQuests.Contains(StageNode.QuestAsset->GetFName()))
+	if (!ActiveQuests.Contains(StageNode->QuestAsset->GetFName()))
 		return;
 
-	const FQuestStageInfo& Stage = StageNode.GetStage();
+	const FQuestStageInfo& Stage = StageNode->GetStage();
 	
 	auto isNeedEvents = Stage.bGenerateEvents;
 	isNeedEvents = !Stage.Caption.IsEmpty();
@@ -361,47 +377,48 @@ void UQuestComponent::CompleteStage(FQuestItemNode& StageNode)
 	QuestTags.AppendTags(Stage.GiveKeys);
 	QuestTags.RemoveTags(Stage.RemoveKeys);
 	
-	if (StageNode.Status == EQuestCompleteStatus::Completed)
+	if (StageNode->Status == EQuestCompleteStatus::Completed)
 	{
 		WaitStage(StageNode);
 	}
 }
 
-void UQuestComponent::WaitStage(FQuestItemNode& StageNode)
+void UQuestComponent::WaitStage(
+	TSharedPtr<FQuestItemNode> StageNode)
 {
 	//if (bIsResetBegin)
 	//	return;
-	check(StageNode.QuestAsset.Get());
+	check(StageNode->QuestAsset.Get());
 
-	const FQuestStageInfo& Stage = StageNode.GetStage();
+	const FQuestStageInfo& Stage = StageNode->GetStage();
 
-	TArray<FQuestItemNode> Stages = StageNode.GetNextStage(this);
+	TArray<TSharedPtr<FQuestItemNode>> Stages = StageNode->GetNextStage(this);
 	auto bIsOptionalOnly = true;
 	
-	for (const FQuestItemNode& stage : Stages)
+	for (const TSharedPtr<FQuestItemNode>& stage : Stages)
 	{
-		bIsOptionalOnly &= stage.GetStage().bIsOptional;
+		bIsOptionalOnly &= stage->GetStage().bIsOptional;
 	}
 	//
 	if (Stages.Num() == 0 || bIsOptionalOnly)
 	{
-		EndQuest(StageNode.QuestAsset.Get(), EQuestCompleteStatus::Completed);
+		EndQuest(StageNode->QuestAsset.Get(), EQuestCompleteStatus::Completed);
 		return;
 	}
 	
-	for (FQuestItemNode& stage : Stages)
+	for (TSharedPtr<FQuestItemNode>& stage : Stages)
 	{
-		stage.SetStatus(EQuestCompleteStatus::Active, this);
-		UE_LOG(DialogModuleLog, Log, TEXT("WaitStage %s Quest %s"), *stage.GetStage().Caption.ToString(), *stage.QuestAsset->GetName());
-		if(!ActiveQuests.Contains(StageNode.QuestAsset->GetFName()))
+		stage->SetStatus(EQuestCompleteStatus::Active, this);
+		UE_LOG(DialogModuleLog, Log, TEXT("WaitStage %s Quest %s"), *stage->GetStage().Caption.ToString(), *stage->QuestAsset->GetName());
+		if(!ActiveQuests.Contains(StageNode->QuestAsset->GetFName()))
 		{
 			return;
 		}
 
-		if (stage.TryComplete(this))
+		if (stage->TryComplete(this))
 		{
-			UE_LOG(DialogModuleLog, Log, TEXT("Stage %s Completed"), *stage.GetStage().Caption.ToString());
-			if (ActiveQuests[StageNode.QuestAsset->GetFName()].Status != EQuestCompleteStatus::Active)
+			UE_LOG(DialogModuleLog, Log, TEXT("Stage %s Completed"), *stage->GetStage().Caption.ToString());
+			if (ActiveQuests[StageNode->QuestAsset->GetFName()].Status != EQuestCompleteStatus::Active)
 				break;
 		}
 	}

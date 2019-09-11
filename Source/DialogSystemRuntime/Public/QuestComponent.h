@@ -19,7 +19,7 @@ struct DIALOGSYSTEMRUNTIME_API FQuestItemNode
 {
 	GENERATED_BODY()
 private:
-	TArray<FQuestItemNode> CachedChilds;
+	TArray<TSharedPtr<FQuestItemNode>> CachedChilds;
 	FDelegateHandle TagsAddedHandle;
 	FDelegateHandle TagsRemovedHandle;
 public:
@@ -54,12 +54,13 @@ public:
 	}
 	struct FQuestItem& GetOwner(class UQuestComponent* Owner);
 	
-	FQuestItemNode LoadNode(FGuid Uid, UQuestComponent* InOwner)
+	TSharedPtr<FQuestItemNode> LoadNode(FGuid Uid, UQuestComponent* InOwner)
 	{
-		FQuestItemNode Node;
-		Node.QuestAsset = QuestAsset;
-		Node.Childs = QuestAsset->Joins[Uid].UIDs;
-		Node.UUID = Uid;
+		TSharedPtr<FQuestItemNode> Node = MakeShareable(new FQuestItemNode);
+		Node->QuestAsset = QuestAsset;
+		Node->Childs = QuestAsset->Joins[Uid].UIDs;
+		Node->UUID = Uid;
+		Node->OwnerQC = OwnerQC;
 		return Node;
 	}
 
@@ -69,7 +70,7 @@ public:
 	bool MatchTringgerParam(const FString& value, const FString& filter);
 	void OnChangeStoryKey(const FGameplayTagContainer& key);
 
-	TArray<FQuestItemNode> GetNextStage(class UQuestComponent* Owner)
+	TArray<TSharedPtr<FQuestItemNode>> GetNextStage(class UQuestComponent* Owner)
 	{
 		if (CachedChilds.Num() == 0)
 		{
@@ -78,10 +79,9 @@ public:
 				CachedChilds.Add(LoadNode(child, OwnerQC.Get()));
 			}
 		}
-
-		return CachedChilds.FilterByPredicate([=](const FQuestItemNode& node)
+		return CachedChilds.FilterByPredicate([=](const TSharedPtr<FQuestItemNode>& node)
 			{
-				return node.CkeckForActivate(Owner);
+				return node->CkeckForActivate(Owner);
 			});
 	}
 
@@ -108,6 +108,10 @@ struct DIALOGSYSTEMRUNTIME_API FQuestItem
 {
 	GENERATED_BODY()
 public:
+	TSharedPtr<FQuestItemNode> RootNode;
+
+	FQuestItemNode RootNode2;
+
 	UPROPERTY(BlueprintReadOnly)
 	EQuestCompleteStatus Status;
 
@@ -129,13 +133,16 @@ public:
 		, Asset(nullptr)
 	{}
 
-	FQuestItemNode LoadNode(FGuid Uid, class UQuestComponent* InOwner)
+	TSharedPtr<FQuestItemNode> LoadNode(FGuid Uid, class UQuestComponent* InOwner)
 	{
-		FQuestItemNode Node;
-		Node.Childs = Asset->Joins[Uid].UIDs;
-		Node.UUID = Uid;
-		Node.QuestAsset = Asset;
-		Node.OwnerQC = InOwner;
+		TSharedPtr<FQuestItemNode> Node = MakeShareable(new FQuestItemNode);
+		Node->Childs = Asset->Joins[Uid].UIDs;
+		Node->UUID = Uid;
+		Node->QuestAsset = Asset;
+		Node->OwnerQC = InOwner;
+
+		RootNode = Node;
+		RootNode2 = *Node.Get();
 		return Node;
 	}
 };
@@ -196,8 +203,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Gameplay|Quest")
 	void StartQuest(TAssetPtr<UQuestAsset> QuestAsset);
 
-	void CompleteStage(FQuestItemNode& StageNode);
-	void WaitStage(FQuestItemNode& StageNode);
+	void CompleteStage(
+		TSharedPtr<FQuestItemNode> StageNode);
+	void WaitStage(
+		TSharedPtr<FQuestItemNode> StageNode);
 
 	UFUNCTION(BlueprintCallable, Category = "Gameplay|Quest")
 	void EndQuest(UQuestAsset* Quest, EQuestCompleteStatus QuestStatus);
