@@ -46,14 +46,13 @@ void AStoryVolume::Activate(AActor* Other)
 	IQuestInterface* QI = Cast<IQuestInterface>(Other);
 	UQuestComponent* QE = QI->GetQuestComponent();
 
-	//if (ActivateTriggers.Num() > 0)
-	//{
-	//	auto stm = UStoryTriggerManager::GetStoryTriggerManager(this);
-	//	for (auto& trigger : ActivateTriggers)
-	//	{
-	//		stm->InvokeTrigger(trigger);
-	//	}
-	//}
+	if (ActivateTriggers.Num() > 0)
+	{
+		for (auto& trigger : ActivateTriggers)
+		{
+			QE->InvokeTrigger(trigger);
+		}
+	}
 
 	if (!StartQuest.IsNull())
 	{

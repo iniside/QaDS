@@ -23,7 +23,7 @@ struct DIALOGSYSTEMRUNTIME_API FStoryTriggerCondition
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName TriggerName;
+	FGameplayTag TriggerName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int TotalCount = 1;
@@ -57,19 +57,24 @@ struct DIALOGSYSTEMRUNTIME_API FQuestStageInfo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stage")
 	bool bGenerateEvents = true;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Conditions")
+	/* I must have all I these tags to meet requirements */
+	UPROPERTY(EditAnywhere, meta = (GameplayTagFilter = "GameplayQuest"), BlueprintReadOnly, Category = "Conditions")
 	FGameplayTagContainer CheckHasKeys;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Conditions")
+	/* I must not have any of these tags to meet requirements. */
+	UPROPERTY(EditAnywhere, meta = (GameplayTagFilter = "GameplayQuest"), BlueprintReadOnly, Category = "Conditions")
 	FGameplayTagContainer CheckDontHasKeys;
 
+	/* Custom predicate to check if we meet requirements */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Conditions")
 	TArray<FQuestStageCondition> Predicate;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Task")
+	/* I will try to complete this stage when all of these are added. */
+	UPROPERTY(EditAnywhere, meta = (GameplayTagFilter = "GameplayQuest"), BlueprintReadOnly, Category = "Task")
 	FGameplayTagContainer WaitHasKeys;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Task")
+	/* I will try to complete this stage when all of these tags are removed. */
+	UPROPERTY(EditAnywhere, meta = (GameplayTagFilter = "GameplayQuest"), BlueprintReadOnly, Category = "Task")
 	FGameplayTagContainer WaitDontHasKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Task")
@@ -78,10 +83,12 @@ struct DIALOGSYSTEMRUNTIME_API FQuestStageInfo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Task")
 	TArray<FQuestStageCondition> WaitPredicate;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Failed")
+	/* If I get all of these tags I will fail this stage. */
+	UPROPERTY(EditAnywhere, meta = (GameplayTagFilter = "GameplayQuest"), BlueprintReadOnly, Category = "Failed")
 	FGameplayTagContainer FailedIfGiveKeys;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Failed")
+	/* If all of these tags will be removed I will fail this stage. */
+	UPROPERTY(EditAnywhere, meta = (GameplayTagFilter = "GameplayQuest"), BlueprintReadOnly, Category = "Failed")
 	FGameplayTagContainer FailedIfRemoveKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Failed")
@@ -93,10 +100,12 @@ struct DIALOGSYSTEMRUNTIME_API FQuestStageInfo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Failed")
 	bool bFailedQuest = true;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Complete")
+	/* I will give you thse tags if you complete this stage. */
+	UPROPERTY(EditAnywhere, meta = (GameplayTagFilter = "GameplayQuest"), BlueprintReadOnly, Category = "Complete")
 	FGameplayTagContainer GiveKeys;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Complete")
+	/* I will remove these tags if you complete this stage. */
+	UPROPERTY(EditAnywhere, meta = (GameplayTagFilter = "GameplayQuest"), BlueprintReadOnly, Category = "Complete")
 	FGameplayTagContainer RemoveKeys;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Complete")

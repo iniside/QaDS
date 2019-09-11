@@ -38,6 +38,72 @@ bool FQuestItemNode::CkeckForActivate(UQuestComponent* Owner) const
 	return true;
 }
 
+void FQuestItemNode::OnTrigger(const FStoryTrigger& Trigger)
+{
+	const FQuestStageInfo& Stage = GetStage();
+	
+	for (const FStoryTriggerCondition& cond : Stage.WaitTriggers)
+	{
+		if (MatchTringger(cond, Trigger))
+			break;
+	}
+
+	for (const FStoryTriggerCondition& cond : Stage.FailedTriggers)
+	{
+		if (MatchTringger(cond, Trigger))
+			break;
+	}
+}
+
+bool FQuestItemNode::MatchTringger(const FStoryTriggerCondition& condition, const FStoryTrigger& trigger)
+{
+	if (condition.TriggerName != trigger.TriggerName)
+		return false;
+
+	for (auto kpv : trigger.Params)
+	{
+		if (!condition.ParamsMasks.Contains(kpv.Key))
+			return false;
+
+		auto filter = condition.ParamsMasks[kpv.Key];
+
+		if (!MatchTringgerParam(kpv.Value, filter))
+			return false;
+	}
+
+	check(false);
+	//condition.TotalCount -= trigger.Count;
+
+	if (condition.TotalCount <= 0)
+		TryComplete(OwnerQC.Get());
+
+	return true;
+}
+
+bool FQuestItemNode::MatchTringgerParam(const FString& value, const FString& filter)
+{
+	if (filter == "*")
+		return true;
+
+	if (filter == value)
+		return true;
+
+	return false;
+}
+
+void FQuestItemNode::OnChangeStoryKey(const FGameplayTagContainer& key)
+{
+	const FQuestStageInfo& Stage = GetStage();
+	
+	if (Stage.WaitHasKeys.HasAll(key)		 ||
+		Stage.WaitDontHasKeys.HasAll(key)  ||
+		Stage.FailedIfGiveKeys.HasAll(key) ||
+		Stage.FailedIfRemoveKeys.HasAll(key))
+	{
+		TryComplete(OwnerQC.Get());
+	}
+}
+
 void FQuestItemNode::Activate(UQuestComponent* Owner)
 {
 	FQuestItem& OwnerQuest = GetOwner(Owner);
@@ -54,8 +120,8 @@ void FQuestItemNode::Activate(UQuestComponent* Owner)
 		Stage.FailedIfGiveKeys.Num() > 0 ||
 		Stage.FailedIfRemoveKeys.Num() > 0)
 	{
-	//	Processor->StoryKeyManager->OnKeyRemoveBP.AddDynamic(this, &UQuestRuntimeNode::OnChangeStoryKey);
-	//	Processor->StoryKeyManager->OnKeyAddBP.AddDynamic(this, &UQuestRuntimeNode::OnChangeStoryKey);
+		TagsAddedHandle = Owner->OnTagsAdded.AddRaw(this, &FQuestItemNode::OnChangeStoryKey);
+		TagsRemovedHandle = Owner->OnTagsRemoved.AddRaw(this, &FQuestItemNode::OnChangeStoryKey);
 	}
 	
 	if (Stage.FailedTriggers.Num() > 0 || Stage.WaitTriggers.Num() > 0)
@@ -104,8 +170,8 @@ void FQuestItemNode::Deactivate(UQuestComponent* Owner)
 	//
 	Owner->CompleteStage(*this);
 	//
-	//Processor->StoryKeyManager->OnKeyRemoveBP.RemoveDynamic(this, &UQuestRuntimeNode::OnChangeStoryKey);
-	//Processor->StoryKeyManager->OnKeyAddBP.RemoveDynamic(this, &UQuestRuntimeNode::OnChangeStoryKey);
+	Owner->OnTagsAdded.Remove(TagsAddedHandle);
+	Owner->OnTagsRemoved.Remove(TagsRemovedHandle);
 	//Processor->StoryTriggerManager->OnTriggerInvoke.RemoveDynamic(this, &UQuestRuntimeNode::OnTrigger);
 }
 
@@ -265,7 +331,7 @@ void UQuestComponent::StartQuest(TAssetPtr<UQuestAsset> QuestAsset)
 	//activeQuests.Add(runtimeQuest);
 	//OnQuestStart.Broadcast(runtimeQuest);
 
-	auto root = StartNode.LoadNode(Quest->RootNode);
+	auto root = StartNode.LoadNode(Quest->RootNode, this);
 	WaitStage(root);
 }
 
@@ -292,8 +358,13 @@ void UQuestComponent::CompleteStage(FQuestItemNode& StageNode)
 		//OnStageComplete.Broadcast(StageNode->OwnerQuest, StageNode->Stage);
 	}
 
+	QuestTags.AppendTags(Stage.GiveKeys);
+	QuestTags.RemoveTags(Stage.RemoveKeys);
+	
 	if (StageNode.Status == EQuestCompleteStatus::Completed)
+	{
 		WaitStage(StageNode);
+	}
 }
 
 void UQuestComponent::WaitStage(FQuestItemNode& StageNode)
@@ -362,7 +433,7 @@ void UQuestComponent::EndQuest(UQuestAsset* Quest, EQuestCompleteStatus QuestSta
 		SucceededQuests.Add(Quest);
 	}
 
-	//OnQuestEnd.Broadcast(Quest, Status);
+	OnQuestEnd.Broadcast(Quest, QuestStatus);
 	QuestRoot.Script->Destroy();
 }
 
@@ -371,3 +442,19 @@ TArray<UQuestRuntimeAsset*> UQuestComponent::GetQuests(EQuestCompleteStatus Filt
 	return TArray<UQuestRuntimeAsset*>();
 }
 
+void UQuestComponent::InvokeTrigger(const FStoryTrigger& InTrigger)
+{
+	OnTriggerInvoke.Broadcast(InTrigger);
+}
+
+void UQuestComponent::AddQuestTags(const FGameplayTagContainer& InTags)
+{
+	QuestTags.AppendTags(InTags);
+	OnTagsAdded.Broadcast(InTags);
+}
+
+void UQuestComponent::RemoveQuestTags(const FGameplayTagContainer& InTags)
+{
+	QuestTags.RemoveTags(InTags);
+	OnTagsRemoved.Broadcast(InTags);
+}

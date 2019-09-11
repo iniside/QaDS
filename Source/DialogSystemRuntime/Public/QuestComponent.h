@@ -9,13 +9,21 @@
 #include "QuestAsset.h"
 #include "QuestComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FQuestOnQuestTagsChanged, const FGameplayTagContainer&);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FQuestOnQuestEnd, class UQuestAsset*, Quest, EQuestCompleteStatus, Status);
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FQuestStoryTriggerInvokeSignature, const FStoryTrigger&);
+
 USTRUCT(BlueprintType)
 struct DIALOGSYSTEMRUNTIME_API FQuestItemNode
 {
 	GENERATED_BODY()
 private:
 	TArray<FQuestItemNode> CachedChilds;
+	FDelegateHandle TagsAddedHandle;
+	FDelegateHandle TagsRemovedHandle;
 public:
+	TWeakObjectPtr<class UQuestComponent> OwnerQC;
 	friend class UQuestComponent;
 
 	UPROPERTY()
@@ -35,18 +43,18 @@ public:
 		return QuestAsset->Nodes[UUID];
 	}
 	
-	bool operator==(const FQuestItemNode& Rhs)
+	bool operator==(const FQuestItemNode& Rhs) const
 	{
 		return UUID == Rhs.UUID;
 	}
 	
-	bool operator==(const FQuestItemNode* Rhs)
+	bool operator==(const FQuestItemNode* Rhs) const
 	{
 		return UUID == Rhs->UUID;
 	}
 	struct FQuestItem& GetOwner(class UQuestComponent* Owner);
 	
-	FQuestItemNode LoadNode(FGuid Uid)
+	FQuestItemNode LoadNode(FGuid Uid, UQuestComponent* InOwner)
 	{
 		FQuestItemNode Node;
 		Node.QuestAsset = QuestAsset;
@@ -56,6 +64,10 @@ public:
 	}
 
 	bool CkeckForActivate(class UQuestComponent* Owner) const;
+	void OnTrigger(const FStoryTrigger& Trigger);
+	bool MatchTringger(const FStoryTriggerCondition& condition, const FStoryTrigger& trigger);
+	bool MatchTringgerParam(const FString& value, const FString& filter);
+	void OnChangeStoryKey(const FGameplayTagContainer& key);
 
 	TArray<FQuestItemNode> GetNextStage(class UQuestComponent* Owner)
 	{
@@ -63,7 +75,7 @@ public:
 		{
 			for (auto child : Childs)
 			{
-				CachedChilds.Add(LoadNode(child));
+				CachedChilds.Add(LoadNode(child, OwnerQC.Get()));
 			}
 		}
 
@@ -117,12 +129,13 @@ public:
 		, Asset(nullptr)
 	{}
 
-	FQuestItemNode LoadNode(FGuid Uid)
+	FQuestItemNode LoadNode(FGuid Uid, class UQuestComponent* InOwner)
 	{
 		FQuestItemNode Node;
 		Node.Childs = Asset->Joins[Uid].UIDs;
 		Node.UUID = Uid;
 		Node.QuestAsset = Asset;
+		Node.OwnerQC = InOwner;
 		return Node;
 	}
 };
@@ -145,6 +158,16 @@ protected:
 	//TArray<TSoftObjectPtr<class UQuestAsset>> ActiveQuests;
 	TArray<TSoftObjectPtr<class UQuestAsset>> SucceededQuests;
 	TArray<TSoftObjectPtr<class UQuestAsset>> FailedQuests;
+
+
+	FQuestOnQuestTagsChanged OnTagsAdded;
+	FQuestOnQuestTagsChanged OnTagsRemoved;
+
+	FQuestStoryTriggerInvokeSignature OnTriggerInvoke;
+	
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FQuestOnQuestEnd OnQuestEnd;
+	
 public:	
 	// Sets default values for this component's properties
 	UQuestComponent();
@@ -157,6 +180,9 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	void AddQuestTags(const FGameplayTagContainer& InTags);
+	void RemoveQuestTags(const FGameplayTagContainer& InTags);
+	
 	bool HasAllTags(const FGameplayTagContainer& InTags) const
 	{
 		return QuestTags.HasAll(InTags);
@@ -178,4 +204,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Gameplay|Quest")
 	TArray<UQuestRuntimeAsset*> GetQuests(EQuestCompleteStatus FilterStatus) const;
+
+	void InvokeTrigger(const FStoryTrigger& InTrigger);
 };

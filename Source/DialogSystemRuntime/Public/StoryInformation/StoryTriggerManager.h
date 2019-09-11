@@ -1,17 +1,17 @@
 #pragma once
 
 #include "EngineUtils.h"
+#include "GameplayTagContainer.h"
 #include "StoryTriggerManager.generated.h"
 
 USTRUCT(BlueprintType)
 struct DIALOGSYSTEMRUNTIME_API FStoryTrigger
 {
 	GENERATED_BODY()
-
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName TriggerName;
+	FGameplayTag TriggerName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int Count = 1;
