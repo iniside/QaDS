@@ -19,11 +19,11 @@ bool FQuestItemNode::CkeckForActivate(UQuestComponent* Owner) const
 	UE_LOG(DialogModuleLog, Log, TEXT("CkeckForActivate %s Quest %s"), *GetStage().Caption.ToString(), *QuestAsset->GetName());
 	if(Owner->QuestTags.Num() > 0)
 	{
-		if (!Owner->QuestTags.HasAll(GetStage().CheckHasKeys))
+		if (!Owner->QuestTags.HasAllMatchingGameplayTags(GetStage().CheckHasKeys))
 		{
 			return false;
 		}
-		if (Owner->QuestTags.HasAll(GetStage().CheckDontHasKeys))
+		if (Owner->QuestTags.HasAllMatchingGameplayTags(GetStage().CheckDontHasKeys))
 		{
 			return false;
 		}
@@ -374,8 +374,8 @@ void UQuestComponent::CompleteStage(
 		//OnStageComplete.Broadcast(StageNode->OwnerQuest, StageNode->Stage);
 	}
 
-	QuestTags.AppendTags(Stage.GiveKeys);
-	QuestTags.RemoveTags(Stage.RemoveKeys);
+	QuestTags.UpdateTagCount(Stage.GiveKeys, 1);
+	QuestTags.UpdateTagCount(Stage.RemoveKeys, -1);
 	
 	if (StageNode->Status == EQuestCompleteStatus::Completed)
 	{
@@ -466,12 +466,12 @@ void UQuestComponent::InvokeTrigger(const FStoryTrigger& InTrigger)
 
 void UQuestComponent::AddQuestTags(const FGameplayTagContainer& InTags)
 {
-	QuestTags.AppendTags(InTags);
+	QuestTags.UpdateTagCount(InTags, 1);
 	OnTagsAdded.Broadcast(InTags);
 }
 
 void UQuestComponent::RemoveQuestTags(const FGameplayTagContainer& InTags)
 {
-	QuestTags.RemoveTags(InTags);
+	QuestTags.UpdateTagCount(InTags, -1);
 	OnTagsRemoved.Broadcast(InTags);
 }

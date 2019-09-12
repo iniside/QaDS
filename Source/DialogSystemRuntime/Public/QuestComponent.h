@@ -7,6 +7,7 @@
 #include "GameplayEffectTypes.h"
 #include "Quest/QuestNode.h"
 #include "QuestAsset.h"
+#include "QuestTypes.h"
 #include "QuestComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FQuestOnQuestTagsChanged, const FGameplayTagContainer&);
@@ -157,8 +158,8 @@ public:
 	friend struct FQuestItemNode;
 protected:
 	UPROPERTY(SaveGame)
-	FGameplayTagContainer QuestTags;
-
+	FQuestGameplayTagCountContainer QuestTags;
+	
 	UPROPERTY(SaveGame)
 	TMap<FName, FQuestItem> ActiveQuests;
 	
@@ -192,12 +193,12 @@ public:
 	
 	bool HasAllTags(const FGameplayTagContainer& InTags) const
 	{
-		return QuestTags.HasAll(InTags);
+		return QuestTags.HasAllMatchingGameplayTags(InTags);
 	}
 
 	bool NotHaveAllTags(const FGameplayTagContainer& InTags) const
 	{
-		return !QuestTags.HasAll(InTags);
+		return !QuestTags.HasAllMatchingGameplayTags(InTags);
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Gameplay|Quest")
