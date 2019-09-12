@@ -23,6 +23,7 @@ private:
 	TArray<TSharedPtr<FQuestItemNode>> CachedChilds;
 	FDelegateHandle TagsAddedHandle;
 	FDelegateHandle TagsRemovedHandle;
+	FDelegateHandle QuestTriggerHandle;
 public:
 	TWeakObjectPtr<class UQuestComponent> OwnerQC;
 	friend class UQuestComponent;
@@ -88,20 +89,18 @@ public:
 
 
 	void Activate(class UQuestComponent* Owner);
-
 	void Failed(class UQuestComponent* Owner);
-
 	void Complete(class UQuestComponent* Owner);
-
 	void Deactivate(class UQuestComponent* Owner);
-
 	void SetStatus(EQuestCompleteStatus NewStatus, UQuestComponent* Owner);
-
 	bool CkeckForComplete(UQuestComponent* Owner);
-
-	bool CkeckForFailed(UQuestComponent* Owner);
 	
+	bool CkeckForFailed(UQuestComponent* Owner);
 	bool TryComplete(UQuestComponent* Owner);
+
+	bool CkeckForCompleteTrigger(UQuestComponent* Owner);
+	bool CkeckForFailedTrigger(UQuestComponent* Owner);
+	bool TryCompleteTrigger(UQuestComponent* Owner);
 };
 
 USTRUCT(BlueprintType)
@@ -205,9 +204,9 @@ public:
 	void StartQuest(TAssetPtr<UQuestAsset> QuestAsset);
 
 	void CompleteStage(
-		TSharedPtr<FQuestItemNode> StageNode);
+		FQuestItemNode* StageNode);
 	void WaitStage(
-		TSharedPtr<FQuestItemNode> StageNode);
+		FQuestItemNode* StageNode);
 
 	UFUNCTION(BlueprintCallable, Category = "Gameplay|Quest")
 	void EndQuest(UQuestAsset* Quest, EQuestCompleteStatus QuestStatus);

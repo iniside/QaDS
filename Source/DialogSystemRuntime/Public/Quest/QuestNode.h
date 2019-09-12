@@ -21,15 +21,17 @@ struct DIALOGSYSTEMRUNTIME_API FStoryTriggerCondition
 	GENERATED_BODY()
 
 public:
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTag TriggerName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bCompleteOnTrigger;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTag CountedTag;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int TotalCount = 1;
+	int32 TotalCount = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<FName, FString> ParamsMasks;

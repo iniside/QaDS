@@ -74,11 +74,23 @@ bool FQuestItemNode::MatchTringger(const FStoryTriggerCondition& condition, cons
 			return false;
 	}
 
+	const FQuestStageInfo& Stage = GetStage();
+
 	//check(false);
 	//condition.TotalCount -= trigger.Count;
-
-	if (condition.TotalCount <= 0)
-		TryComplete(OwnerQC.Get());
+	if(condition.bCompleteOnTrigger)
+	{
+		UE_LOG(DialogModuleLog, Log, TEXT("MatchTringger CompleteOnTrigger Condition: %s Trigger: %s Quest: %s Stage: %s"), *condition.ToString(), *trigger.TriggerName.ToString(), *QuestAsset->GetName(), *Stage.Caption.ToString());
+		TryCompleteTrigger(OwnerQC.Get());
+		return true;
+	}
+	int32 Count =  OwnerQC->QuestTags.GetTagCount(condition.CountedTag);
+	if (Count == condition.TotalCount)
+	{
+		UE_LOG(DialogModuleLog, Log, TEXT("MatchTringger Condition: %s Trigger: %s Quest: %s Stage: %s CountTag: %s-%d"), *condition.ToString(), *trigger.TriggerName.ToString(), *QuestAsset->GetName(), *Stage.Caption.ToString(), *condition.CountedTag.ToString(), Count);
+		TryCompleteTrigger(OwnerQC.Get());
+	}
+		
 
 	return true;
 }
@@ -129,7 +141,7 @@ void FQuestItemNode::Activate(UQuestComponent* Owner)
 	
 	if (Stage.FailedTriggers.Num() > 0 || Stage.WaitTriggers.Num() > 0)
 	{
-		Owner->OnTriggerInvoke.AddRaw(this, &FQuestItemNode::OnTrigger);
+		QuestTriggerHandle = Owner->OnTriggerInvoke.AddRaw(this, &FQuestItemNode::OnTrigger);
 	}
 }
 
@@ -171,11 +183,11 @@ void FQuestItemNode::Deactivate(UQuestComponent* Owner)
 	GetOwner(Owner).ActiveNodes.Remove(*this);
 	GetOwner(Owner).ArchiveNodes.Add(*this);
 	//
-	Owner->CompleteStage(MakeShareable(this));
+	Owner->CompleteStage(this);
 	//
 	Owner->OnTagsAdded.Remove(TagsAddedHandle);
 	Owner->OnTagsRemoved.Remove(TagsRemovedHandle);
-	//Processor->StoryTriggerManager->OnTriggerInvoke.RemoveDynamic(this, &UQuestRuntimeNode::OnTrigger);
+	Owner->OnTriggerInvoke.Remove(QuestTriggerHandle);
 }
 
 void FQuestItemNode::SetStatus(EQuestCompleteStatus NewStatus, UQuestComponent* Owner)
@@ -209,24 +221,20 @@ void FQuestItemNode::SetStatus(EQuestCompleteStatus NewStatus, UQuestComponent* 
 bool FQuestItemNode::CkeckForComplete(UQuestComponent* Owner)
 {
 	const FQuestStageInfo& Stage = GetStage();
-	if(Stage.WaitTriggers.Num() > 0)
-	{
-		return false;
-	}
-	for (auto& cond : Stage.WaitTriggers)
-	{
-		if (cond.TotalCount != 0)
-			return false;
-	}
 	
-
 	if (Owner->QuestTags.Num() > 0)
 	{
 		if (Owner->NotHaveAllTags(Stage.WaitHasKeys))
+		{
+			UE_LOG(DialogModuleLog, Log, TEXT("CkeckForComplete Quest: %s Stage: %s Not Have Tags: %s"), *QuestAsset->GetName(), *Stage.Caption.ToString(), *Stage.WaitHasKeys.ToString());
 			return false;
+		}
 
 		if (Owner->HasAllTags(Stage.WaitDontHasKeys))
+		{
+			UE_LOG(DialogModuleLog, Log, TEXT("CkeckForComplete Quest: %s Stage: %s Not Have Tags: %s"), *QuestAsset->GetName(), *Stage.Caption.ToString(), *Stage.WaitDontHasKeys.ToString());
 			return false;
+		}
 	}
 
 	for (auto& Conditions : Stage.WaitPredicate)
@@ -245,15 +253,6 @@ bool FQuestItemNode::CkeckForComplete(UQuestComponent* Owner)
 bool FQuestItemNode::CkeckForFailed(UQuestComponent* Owner)
 {
 	const FQuestStageInfo& Stage = GetStage();
-	if (Stage.WaitTriggers.Num() > 0)
-	{
-		return false;
-	}
-	for (auto& cond : Stage.FailedTriggers)
-	{
-		if (cond.TotalCount == 0)
-			return true;
-	}
 	
 	if(Owner->QuestTags.Num() > 0)
 	{
@@ -283,6 +282,65 @@ bool FQuestItemNode::TryComplete(UQuestComponent* Owner)
 	else
 	{
 		if (!CkeckForComplete(Owner))
+			return false;
+
+		SetStatus(EQuestCompleteStatus::Completed, Owner);
+	}
+	return true;
+}
+
+bool FQuestItemNode::CkeckForCompleteTrigger(
+	UQuestComponent* Owner)
+{
+	const FQuestStageInfo& Stage = GetStage();
+
+	for (auto& cond : Stage.WaitTriggers)
+	{
+		if (cond.bCompleteOnTrigger)
+		{
+			UE_LOG(DialogModuleLog, Log, TEXT("CkeckForComplete CompleteOnTrigger Quest: %s Stage %s"), *QuestAsset->GetName(), *Stage.Caption.ToString());
+			return true;
+		}
+		int32 Count = OwnerQC->QuestTags.GetTagCount(cond.CountedTag);
+		if (cond.TotalCount == Count)
+		{
+			UE_LOG(DialogModuleLog, Log, TEXT("CkeckForComplete Quest: %s Stage: %s CountTag: %s"), *QuestAsset->GetName(), *Stage.Caption.ToString(), *cond.CountedTag.ToString());
+			return true;
+		}
+	}
+	return false;
+}
+
+bool FQuestItemNode::CkeckForFailedTrigger(
+	UQuestComponent* Owner)
+{
+	const FQuestStageInfo& Stage = GetStage();
+
+	for (auto& cond : Stage.FailedTriggers)
+	{
+		if (cond.bCompleteOnTrigger)
+		{
+			return true;
+		}
+		int32 Count = OwnerQC->QuestTags.GetTagCount(cond.CountedTag);
+		if (cond.TotalCount == Count)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool FQuestItemNode::TryCompleteTrigger(
+	UQuestComponent* Owner)
+{
+	if (CkeckForFailedTrigger(Owner))
+	{
+		SetStatus(EQuestCompleteStatus::Failed, Owner);
+	}
+	else
+	{
+		if (!CkeckForCompleteTrigger(Owner))
 			return false;
 
 		SetStatus(EQuestCompleteStatus::Completed, Owner);
@@ -346,12 +404,12 @@ void UQuestComponent::StartQuest(TAssetPtr<UQuestAsset> QuestAsset)
 	//OnQuestStart.Broadcast(runtimeQuest);
 
 	auto root = ActiveQuests[QuestAsset->GetFName()].LoadNode(Quest->RootNode, this);
-	WaitStage(root);
+	WaitStage(root.Get());
 	
 }
 
 void UQuestComponent::CompleteStage(
-	TSharedPtr<FQuestItemNode> StageNode)
+	FQuestItemNode* StageNode)
 {
 	//if (bIsResetBegin)
 	//	return;
@@ -384,7 +442,7 @@ void UQuestComponent::CompleteStage(
 }
 
 void UQuestComponent::WaitStage(
-	TSharedPtr<FQuestItemNode> StageNode)
+	FQuestItemNode* StageNode)
 {
 	//if (bIsResetBegin)
 	//	return;
