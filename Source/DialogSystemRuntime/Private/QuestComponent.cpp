@@ -7,7 +7,6 @@
 #include "QaDSSettings.h"
 #include "QuestScript.h"
 #include "SharedPointerInternals.h"
-#include "SharedPointerInternals.h"
 
 FQuestItem& FQuestItemNode::GetOwner(UQuestComponent* Owner)
 {
@@ -174,8 +173,10 @@ void FQuestItemNode::Complete(UQuestComponent* Owner)
 		Owner->EndQuest(QuestAsset.Get(), Stage.ChangeQuestState);
 	}
 	
-	//for (auto& Event : Stage.Action)
-	//	Event.Invoke(this);
+	for (const FQuestStageEvent& Event : Stage.Action)
+	{
+		const_cast<FQuestStageEvent&>(Event).Invoke(this, Owner);
+	};
 }
 
 void FQuestItemNode::Deactivate(UQuestComponent* Owner)

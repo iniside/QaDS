@@ -10,6 +10,11 @@ class UQuestGraphSchema : public UDialogGraphSchema
 	GENERATED_BODY()
 
 public:
-	virtual void GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const override;
+#if ENGINE_MINOR_VERSION < 24
+	virtual void GetGraphContextActions(FGraphContextMenuBuilder & ContextMenuBuilder) const override;
 	virtual void GetContextMenuActions(const UEdGraph* CurrentGraph, const UEdGraphNode* InGraphNode, const UEdGraphPin* InGraphPin, FMenuBuilder* MenuBuilder, bool bIsDebugging) const override;
+#else
+	virtual void GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const override;
+	virtual void GetContextMenuActions(class UToolMenu* Menu, class UGraphNodeContextMenuContext* Context) const override;
+#endif
 };

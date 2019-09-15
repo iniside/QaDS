@@ -19,6 +19,7 @@
 #include "DialogGraphSchema.h"
 #include "BrushSet.h"
 #include "QaDSGraphSchema.h"
+#include "AssetEditorManager.h"
 
 #define LOCTEXT_NAMESPACE "DialogGraph"
 

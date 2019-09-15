@@ -46,9 +46,17 @@ public class DialogSystemEditor : ModuleRules
                 "ApplicationCore",
                 "DesktopPlatform",
                 "XmlParser",
-
                 "DialogSystemRuntime",
             }
         );
+        if (Target.Version.MinorVersion >= 24)
+        {
+	        PrivateDependencyModuleNames.AddRange(
+		        new string[]
+		        {
+			        "ToolMenus"
+		        }
+	        );
+        }
     }
 }

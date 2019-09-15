@@ -92,7 +92,77 @@ public:
 		}
 		return AnyMatch;
 	}
+	/**
+	 * Determine if TagToCheck is present in this container, also checking against parent tags
+	 * {"A.1"}.HasTag("A") will return True, {"A"}.HasTag("A.1") will return False
+	 * If TagToCheck is not Valid it will always return False
+	 *
+	 * @return True if TagToCheck is in this container, false if it is not
+	 */
+	FORCEINLINE_DEBUGGABLE bool HasTag(const FGameplayTag& TagToCheck) const
+	{
+		return ExplicitTags.HasTag(TagToCheck);
+	}
 
+	/**
+	 * Determine if TagToCheck is explicitly present in this container, only allowing exact matches
+	 * {"A.1"}.HasTagExact("A") will return False
+	 * If TagToCheck is not Valid it will always return False
+	 *
+	 * @return True if TagToCheck is in this container, false if it is not
+	 */
+	FORCEINLINE_DEBUGGABLE bool HasTagExact(const FGameplayTag& TagToCheck) const
+	{
+		return ExplicitTags.HasTagExact(TagToCheck);
+	}
+
+	/**
+	 * Checks if this container contains ANY of the tags in the specified container, also checks against parent tags
+	 * {"A.1"}.HasAny({"A","B"}) will return True, {"A"}.HasAny({"A.1","B"}) will return False
+	 * If ContainerToCheck is empty/invalid it will always return False
+	 *
+	 * @return True if this container has ANY of the tags of in ContainerToCheck
+	 */
+	FORCEINLINE_DEBUGGABLE bool HasAny(const FGameplayTagContainer& ContainerToCheck) const
+	{
+		return ExplicitTags.HasAny(ContainerToCheck);
+	}
+
+	/**
+	 * Checks if this container contains ANY of the tags in the specified container, only allowing exact matches
+	 * {"A.1"}.HasAny({"A","B"}) will return False
+	 * If ContainerToCheck is empty/invalid it will always return False
+	 *
+	 * @return True if this container has ANY of the tags of in ContainerToCheck
+	 */
+	FORCEINLINE_DEBUGGABLE bool HasAnyExact(const FGameplayTagContainer& ContainerToCheck) const
+	{
+		return ExplicitTags.HasAnyExact(ContainerToCheck);
+	}
+
+	/**
+	 * Checks if this container contains ALL of the tags in the specified container, also checks against parent tags
+	 * {"A.1","B.1"}.HasAll({"A","B"}) will return True, {"A","B"}.HasAll({"A.1","B.1"}) will return False
+	 * If ContainerToCheck is empty/invalid it will always return True, because there were no failed checks
+	 *
+	 * @return True if this container has ALL of the tags of in ContainerToCheck, including if ContainerToCheck is empty
+	 */
+	FORCEINLINE_DEBUGGABLE bool HasAll(const FGameplayTagContainer& ContainerToCheck) const
+	{
+		return ExplicitTags.HasAll(ContainerToCheck);
+	}
+
+	/**
+	 * Checks if this container contains ALL of the tags in the specified container, only allowing exact matches
+	 * {"A.1","B.1"}.HasAll({"A","B"}) will return False
+	 * If ContainerToCheck is empty/invalid it will always return True, because there were no failed checks
+	 *
+	 * @return True if this container has ALL of the tags of in ContainerToCheck, including if ContainerToCheck is empty
+	 */
+	FORCEINLINE_DEBUGGABLE bool HasAllExact(const FGameplayTagContainer& ContainerToCheck) const
+	{
+		return ExplicitTags.HasAllExact(ContainerToCheck);
+	}
 	/**
 	 * Update the specified container of tags by the specified delta, potentially causing an additional or removal from the explicit tag list
 	 *

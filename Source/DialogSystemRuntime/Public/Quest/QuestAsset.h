@@ -42,6 +42,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool bIsSingltone = true;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool bIsRepeatable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float RepeatableCooldown;
+
 	UPROPERTY(EditAnywhere, meta = (DisplayName = "QuestScript"))
 	TSoftClassPtr<AQuestScript> QuestScriptClass;
 	
