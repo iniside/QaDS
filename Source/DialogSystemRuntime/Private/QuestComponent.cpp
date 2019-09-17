@@ -18,13 +18,21 @@ bool FQuestItemNode::CkeckForActivate(UQuestComponent* Owner) const
 	UE_LOG(DialogModuleLog, Log, TEXT("CkeckForActivate [%s] Quest [%s]"), *GetStage().Caption.ToString(), *QuestAsset->GetName());
 	if(Owner->QuestTags.Num() > 0)
 	{
-		if (!Owner->QuestTags.HasAllMatchingGameplayTags(GetStage().CheckHasKeys))
+		const FQuestStageInfo& Stage = GetStage();
+		if(Stage.CheckHasKeys.Num() > 0)
 		{
-			return false;
+			if (!Owner->QuestTags.HasAllMatchingGameplayTags(Stage.CheckHasKeys))
+			{
+				return false;
+			}
 		}
-		if (Owner->QuestTags.HasAllMatchingGameplayTags(GetStage().CheckDontHasKeys))
+		
+		if(Stage.CheckDontHasKeys.Num() > 0)
 		{
-			return false;
+			if (Owner->QuestTags.HasAllMatchingGameplayTags(Stage.CheckDontHasKeys))
+			{
+				return false;
+			}
 		}
 	}
 	
@@ -60,8 +68,12 @@ bool FQuestItemNode::MatchTringger(const FStoryTriggerCondition& condition, cons
 {
 	UE_LOG(DialogModuleLog, Log, TEXT("MatchTringger Condition: [%s] Trigger: [%s] Quest: [%s]"), *condition.ToString(), *trigger.TriggerName.ToString(), *QuestAsset->GetName());
 	if (condition.TriggerName != trigger.TriggerName)
+	{
+		const FQuestStageInfo& Stage = GetStage();
+		
+		UE_LOG(DialogModuleLog, Log, TEXT("  MatchTringger Quest: [%s] Stage: [%s] Triggers do not match"), *QuestAsset->GetName(), *Stage.Caption.ToString());
 		return false;
-
+	}
 	for (auto kpv : trigger.Params)
 	{
 		if (!condition.ParamsMasks.Contains(kpv.Key))
@@ -225,30 +237,39 @@ bool FQuestItemNode::CkeckForComplete(UQuestComponent* Owner)
 	
 	if (Owner->QuestTags.Num() > 0)
 	{
-		if (Owner->NotHaveAllTags(Stage.WaitHasKeys))
+		if (Stage.WaitHasKeys.Num() > 0)
 		{
-			UE_LOG(DialogModuleLog, Log, TEXT("CkeckForComplete Quest: [%s] Stage: [%s] Not Have Tags: [%s]"), *QuestAsset->GetName(), *Stage.Caption.ToString(), *Stage.WaitHasKeys.ToString());
-			return false;
+			if (Owner->NotHaveAllTags(Stage.WaitHasKeys))
+			{
+				UE_LOG(DialogModuleLog, Log, TEXT("CkeckForComplete Quest: [%s] Stage: [%s] Not Have Tags: [%s]"), *QuestAsset->GetName(), *Stage.Caption.ToString(), *Stage.WaitHasKeys.ToString());
+				return false;
+			}
 		}
-
-		if (Owner->HasAllTags(Stage.WaitDontHasKeys))
+		if (Stage.WaitDontHasKeys.Num() > 0)
 		{
-			UE_LOG(DialogModuleLog, Log, TEXT("CkeckForComplete Quest: [%s] Stage: [%s] Not Have Tags: [%s]"), *QuestAsset->GetName(), *Stage.Caption.ToString(), *Stage.WaitDontHasKeys.ToString());
-			return false;
+			if (Owner->HasAllTags(Stage.WaitDontHasKeys))
+			{
+				UE_LOG(DialogModuleLog, Log, TEXT("CkeckForComplete Quest: [%s] Stage: [%s] Not Have Tags: [%s]"), *QuestAsset->GetName(), *Stage.Caption.ToString(), *Stage.WaitDontHasKeys.ToString());
+				return false;
+			}
 		}
 	}
 
 	for (auto& Conditions : Stage.WaitPredicate)
 	{
 		if (!Conditions.InvokeCheck(this, Owner))
+		{
 			return false;
+		}
 	}
 
 	if (Owner->QuestTags.Num() == 0)
 	{
 		return false;
 	}
-	return true;
+	
+	UE_LOG(DialogModuleLog, Log, TEXT("CkeckForComplete Quest: [%s] Stage: [%s] Not Completed"), *QuestAsset->GetName(), *Stage.Caption.ToString());
+	return false;
 }
 
 bool FQuestItemNode::CkeckForFailed(UQuestComponent* Owner)
@@ -257,12 +278,21 @@ bool FQuestItemNode::CkeckForFailed(UQuestComponent* Owner)
 	
 	if(Owner->QuestTags.Num() > 0)
 	{
-		if (Owner->HasAllTags(Stage.FailedIfGiveKeys))
-			return true;
-
-
-		if (Owner->NotHaveAllTags(Stage.FailedIfRemoveKeys))
-			return true;
+		if (Stage.FailedIfGiveKeys.Num() > 0)
+		{
+			if (Owner->HasAllTags(Stage.FailedIfGiveKeys))
+			{
+				return true;
+			}
+		}
+		if(Stage.FailedIfRemoveKeys.Num() > 0)
+		{
+			if (Owner->NotHaveAllTags(Stage.FailedIfRemoveKeys))
+			{
+				return true;
+			}
+		}
+		
 	}
 	
 	for (auto& Conditions : Stage.FailedPredicate)
