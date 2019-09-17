@@ -261,21 +261,27 @@ bool UQuestRuntimeNode::CkeckForFailed()
 
 FString FStoryTriggerCondition::ToString() const
 {
-	auto result = TriggerName.ToString() + "[";
+	FString result = TriggerName.ToString();
 
 	TArray<FString> params;
+	
 	ParamsMasks.GenerateValueArray(params);
 
-	for (int i = 0; i < params.Num(); i++)
+	if (params.Num() > 0)
 	{
-		if (i != 0)
-			result += ", ";
+		result = " (";
 
-		result += params[i];
+		for (int i = 0; i < params.Num(); i++)
+		{
+			if (i != 0)
+				result += ", ";
+
+			result += params[i];
+		}
+
+		result += ") ";
 	}
-
-	result += "]";
-
+	
 	if(TotalCount > 1)
 		result += " x" + FString::FromInt(TotalCount);
 
