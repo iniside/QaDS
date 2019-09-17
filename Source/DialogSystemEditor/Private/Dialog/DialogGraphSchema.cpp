@@ -9,8 +9,10 @@
 #include "DialogGraphSchema.h"
 #include "Runtime/Slate/Public/Framework/MultiBox/MultiBoxBuilder.h"
 #include "DialogEditorNodes.h"
+#if ENGINE_MINOR_VERSION > 23
 #include "ToolMenuEntry.h"
 #include "ToolMenu.h"
+#endif
 #include "QaDSGraphSchema.h"
 
 #define LOCTEXT_NAMESPACE "FDialogSystemModule"

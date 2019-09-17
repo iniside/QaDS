@@ -10,8 +10,10 @@
 #include "QaDSGraphSchema.h"
 #include "Runtime/Slate/Public/Framework/MultiBox/MultiBoxBuilder.h"
 #include "QuestEditorNodes.h"
+#if ENGINE_MINOR_VERSION > 23
 #include "ToolMenuEntry.h"
 #include "ToolMenu.h"
+#endif
 #include "DialogEditorNodes.h"
 
 #define LOCTEXT_NAMESPACE "FQuestSystemModule"

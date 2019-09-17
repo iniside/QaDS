@@ -15,7 +15,7 @@ FQuestItem& FQuestItemNode::GetOwner(UQuestComponent* Owner)
 
 bool FQuestItemNode::CkeckForActivate(UQuestComponent* Owner) const
 {
-	UE_LOG(DialogModuleLog, Log, TEXT("CkeckForActivate %s Quest %s"), *GetStage().Caption.ToString(), *QuestAsset->GetName());
+	UE_LOG(DialogModuleLog, Log, TEXT("CkeckForActivate [%s] Quest [%s]"), *GetStage().Caption.ToString(), *QuestAsset->GetName());
 	if(Owner->QuestTags.Num() > 0)
 	{
 		if (!Owner->QuestTags.HasAllMatchingGameplayTags(GetStage().CheckHasKeys))
@@ -58,7 +58,7 @@ void FQuestItemNode::OnTrigger(const FStoryTrigger& Trigger)
 
 bool FQuestItemNode::MatchTringger(const FStoryTriggerCondition& condition, const FStoryTrigger& trigger)
 {
-	UE_LOG(DialogModuleLog, Log, TEXT("MatchTringger Condition : %s : Trigger : %s : Quest : %s :"), *condition.ToString(), *trigger.TriggerName.ToString(), *QuestAsset->GetName());
+	UE_LOG(DialogModuleLog, Log, TEXT("MatchTringger Condition: [%s] Trigger: [%s] Quest: [%s]"), *condition.ToString(), *trigger.TriggerName.ToString(), *QuestAsset->GetName());
 	if (condition.TriggerName != trigger.TriggerName)
 		return false;
 
@@ -79,14 +79,14 @@ bool FQuestItemNode::MatchTringger(const FStoryTriggerCondition& condition, cons
 	//condition.TotalCount -= trigger.Count;
 	if(condition.bCompleteOnTrigger)
 	{
-		UE_LOG(DialogModuleLog, Log, TEXT("MatchTringger CompleteOnTrigger Condition: %s Trigger: %s Quest: %s Stage: %s"), *condition.ToString(), *trigger.TriggerName.ToString(), *QuestAsset->GetName(), *Stage.Caption.ToString());
+		UE_LOG(DialogModuleLog, Log, TEXT("MatchTringger CompleteOnTrigger Condition: [%s] Trigger: [%s] Quest: [%s] Stage: [%s]"), *condition.ToString(), *trigger.TriggerName.ToString(), *QuestAsset->GetName(), *Stage.Caption.ToString());
 		TryCompleteTrigger(OwnerQC.Get());
 		return true;
 	}
 	int32 Count =  OwnerQC->QuestTags.GetTagCount(condition.CountedTag);
 	if (Count == condition.TotalCount)
 	{
-		UE_LOG(DialogModuleLog, Log, TEXT("MatchTringger Condition: %s Trigger: %s Quest: %s Stage: %s CountTag: %s-%d"), *condition.ToString(), *trigger.TriggerName.ToString(), *QuestAsset->GetName(), *Stage.Caption.ToString(), *condition.CountedTag.ToString(), Count);
+		UE_LOG(DialogModuleLog, Log, TEXT("MatchTringger Condition: [%s] Trigger: [%s] Quest: [%s] Stage: [%s] CountTag: [%s-%d]"), *condition.ToString(), *trigger.TriggerName.ToString(), *QuestAsset->GetName(), *Stage.Caption.ToString(), *condition.CountedTag.ToString(), Count);
 		TryCompleteTrigger(OwnerQC.Get());
 	}
 		
@@ -227,13 +227,13 @@ bool FQuestItemNode::CkeckForComplete(UQuestComponent* Owner)
 	{
 		if (Owner->NotHaveAllTags(Stage.WaitHasKeys))
 		{
-			UE_LOG(DialogModuleLog, Log, TEXT("CkeckForComplete Quest: %s Stage: %s Not Have Tags: %s"), *QuestAsset->GetName(), *Stage.Caption.ToString(), *Stage.WaitHasKeys.ToString());
+			UE_LOG(DialogModuleLog, Log, TEXT("CkeckForComplete Quest: [%s] Stage: [%s] Not Have Tags: [%s]"), *QuestAsset->GetName(), *Stage.Caption.ToString(), *Stage.WaitHasKeys.ToString());
 			return false;
 		}
 
 		if (Owner->HasAllTags(Stage.WaitDontHasKeys))
 		{
-			UE_LOG(DialogModuleLog, Log, TEXT("CkeckForComplete Quest: %s Stage: %s Not Have Tags: %s"), *QuestAsset->GetName(), *Stage.Caption.ToString(), *Stage.WaitDontHasKeys.ToString());
+			UE_LOG(DialogModuleLog, Log, TEXT("CkeckForComplete Quest: [%s] Stage: [%s] Not Have Tags: [%s]"), *QuestAsset->GetName(), *Stage.Caption.ToString(), *Stage.WaitDontHasKeys.ToString());
 			return false;
 		}
 	}
@@ -299,13 +299,13 @@ bool FQuestItemNode::CkeckForCompleteTrigger(
 	{
 		if (cond.bCompleteOnTrigger)
 		{
-			UE_LOG(DialogModuleLog, Log, TEXT("CkeckForComplete CompleteOnTrigger Quest: %s Stage %s"), *QuestAsset->GetName(), *Stage.Caption.ToString());
+			UE_LOG(DialogModuleLog, Log, TEXT("CkeckForComplete CompleteOnTrigger Quest: [%s] Stage [%s]"), *QuestAsset->GetName(), *Stage.Caption.ToString());
 			return true;
 		}
 		int32 Count = OwnerQC->QuestTags.GetTagCount(cond.CountedTag);
 		if (cond.TotalCount == Count)
 		{
-			UE_LOG(DialogModuleLog, Log, TEXT("CkeckForComplete Quest: %s Stage: %s CountTag: %s"), *QuestAsset->GetName(), *Stage.Caption.ToString(), *cond.CountedTag.ToString());
+			UE_LOG(DialogModuleLog, Log, TEXT("CkeckForComplete Quest: [%s] Stage: [%s] CountTag: [%s]"), *QuestAsset->GetName(), *Stage.Caption.ToString(), *cond.CountedTag.ToString());
 			return true;
 		}
 	}
@@ -390,7 +390,7 @@ void UQuestComponent::StartQuest(TAssetPtr<UQuestAsset> QuestAsset)
 	
 	if(ActiveQuests.Contains(Quest->GetFName()))
 	{
-		UE_LOG(DialogModuleLog, Log, TEXT("Quest %s already active"), *QuestAsset.GetAssetName());
+		UE_LOG(DialogModuleLog, Log, TEXT("Quest: [%s] already active"), *QuestAsset.GetAssetName());
 		return;
 	}
 
@@ -468,7 +468,7 @@ void UQuestComponent::WaitStage(
 	for (TSharedPtr<FQuestItemNode>& stage : Stages)
 	{
 		stage->SetStatus(EQuestCompleteStatus::Active, this);
-		UE_LOG(DialogModuleLog, Log, TEXT("WaitStage %s Quest %s"), *stage->GetStage().Caption.ToString(), *stage->QuestAsset->GetName());
+		UE_LOG(DialogModuleLog, Log, TEXT("WaitStage: [%s] Quest: [%s]"), *stage->GetStage().Caption.ToString(), *stage->QuestAsset->GetName());
 		if(!ActiveQuests.Contains(StageNode->QuestAsset->GetFName()))
 		{
 			return;
@@ -476,7 +476,7 @@ void UQuestComponent::WaitStage(
 
 		if (stage->TryComplete(this))
 		{
-			UE_LOG(DialogModuleLog, Log, TEXT("Stage %s Completed"), *stage->GetStage().Caption.ToString());
+			UE_LOG(DialogModuleLog, Log, TEXT("Stage: [%s] Completed"), *stage->GetStage().Caption.ToString());
 			if (ActiveQuests[StageNode->QuestAsset->GetFName()].Status != EQuestCompleteStatus::Active)
 				break;
 		}
@@ -493,11 +493,11 @@ void UQuestComponent::EndQuest(UQuestAsset* Quest, EQuestCompleteStatus QuestSta
 
 	if (!bSuccess)
 	{
-		UE_LOG(DialogModuleLog, Warning, TEXT("Failed end quest: quest is not active (%s)"), *Quest->GetFName().ToString());
+		UE_LOG(DialogModuleLog, Warning, TEXT("Failed end quest: quest is not active [%s]"), *Quest->GetFName().ToString());
 		return;
 	}
 
-	UE_LOG(DialogModuleLog, Log, TEXT("Ended : %s : Quest"), *Quest->GetFName().ToString());
+	UE_LOG(DialogModuleLog, Log, TEXT("Ended: [%s] Quest"), *Quest->GetFName().ToString());
 
 	if (QuestRoot.Status == EQuestCompleteStatus::Active)
 	{
