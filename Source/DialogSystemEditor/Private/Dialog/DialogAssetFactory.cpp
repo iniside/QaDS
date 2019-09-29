@@ -1,5 +1,6 @@
-#include "DialogSystemEditor.h"
 #include "DialogAssetFactory.h"
+#include "DialogSystemEditor.h"
+
 #include "DialogEditorNodes.h"
 #include "DialogAsset.h"
 #include "DialogScript.h"

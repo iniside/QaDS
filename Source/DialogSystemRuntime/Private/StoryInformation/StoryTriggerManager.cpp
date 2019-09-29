@@ -1,7 +1,8 @@
+#include "StoryTriggerManager.h"
 #include "DialogSystemRuntime.h"
 #include "EngineUtils.h"
 #include "Runtime/CoreUObject/Public/UObject/UObjectIterator.h"
-#include "StoryTriggerManager.h"
+
 
 UStoryTriggerManager* UStoryTriggerManager::Instance = NULL;
 

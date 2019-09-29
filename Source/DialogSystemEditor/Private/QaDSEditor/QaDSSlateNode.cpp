@@ -1,5 +1,6 @@
-#include "DialogSystemEditor.h"
 #include "QaDSSlateNode.h"
+#include "DialogSystemEditor.h"
+
 #include "EdGraph/EdGraph.h"
 #include "EdGraph/EdGraphPin.h"
 #include "GraphEditorSettings.h"

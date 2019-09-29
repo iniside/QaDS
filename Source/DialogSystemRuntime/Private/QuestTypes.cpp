@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "DialogSystemRuntime.h"
 #include "QuestTypes.h"
+#include "DialogSystemRuntime.h"
+
 
 QuestTypes::QuestTypes()
 {

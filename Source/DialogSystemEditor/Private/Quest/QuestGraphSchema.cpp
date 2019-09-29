@@ -1,3 +1,4 @@
+#include "QaDSGraphSchema.h"
 #include "DialogSystemEditor.h"
 #include "QuestEditorNodes.h"
 #include "EdGraph/EdGraph.h"
@@ -7,7 +8,7 @@
 #include "GraphEditorActions.h"
 #include "RectConnectionDrawingPolicy.h"
 #include "QuestGraphSchema.h"
-#include "QaDSGraphSchema.h"
+
 #include "Runtime/Slate/Public/Framework/MultiBox/MultiBoxBuilder.h"
 #include "QuestEditorNodes.h"
 #if ENGINE_MINOR_VERSION > 23

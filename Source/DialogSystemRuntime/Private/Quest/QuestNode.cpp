@@ -1,5 +1,6 @@
-#include "DialogSystemRuntime.h"
 #include "QuestNode.h"
+#include "DialogSystemRuntime.h"
+
 #include "QuestAsset.h"
 #include "QuestProcessor.h"
 #include "StoryInformationManager.h"

@@ -1,5 +1,6 @@
-#include "DialogSystemRuntime.h"
 #include "StoryVolume.h"
+#include "DialogSystemRuntime.h"
+
 #include "StoryInformationManager.h"
 #include "StoryTriggerManager.h"
 #include "QuestProcessor.h"

@@ -1,3 +1,4 @@
+#include "PhraseNodeCustomization.h"
 #include "DialogSystemEditor.h"
 #include "UObject/UnrealType.h"
 #include "Widgets/Input/SButton.h"
@@ -11,7 +12,7 @@
 #include "IDetailsView.h"
 #include "Slate/SceneViewport.h"
 #include "DialogEditorNodes.h"
-#include "PhraseNodeCustomization.h"
+
 #include "DetailLayoutBuilder.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Editor/UnrealEd/Public/Toolkits/AssetEditorManager.h"

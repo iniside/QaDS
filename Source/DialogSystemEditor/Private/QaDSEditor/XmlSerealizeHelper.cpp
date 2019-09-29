@@ -1,5 +1,6 @@
-#include "DialogSystemEditor.h"
 #include "XmlSerealizeHelper.h"
+#include "DialogSystemEditor.h"
+
 #include "QaDSEdGraphNode.h"
 #include "XmlFile.h"
 

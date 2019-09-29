@@ -1,3 +1,4 @@
+#include "DialogPhraseEvent.h"
 #include "DialogSystemRuntime.h"
 #include "EdGraph/EdGraphPin.h"
 #include "Runtime/Engine/Classes/Engine/World.h"
@@ -9,7 +10,7 @@
 #include "DialogNodes.h"
 #include "DialogAsset.h"
 #include "DialogScript.h"
-#include "DialogPhraseEvent.h"
+
 
 bool FDialogPhraseEvent::Compile(FString& ErrorMessage)
 {

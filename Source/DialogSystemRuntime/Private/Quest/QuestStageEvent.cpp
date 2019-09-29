@@ -1,3 +1,4 @@
+#include "QuestStageEvent.h"
 #include "DialogSystemRuntime.h"
 #include "EdGraph/EdGraphPin.h"
 #include "Runtime/Engine/Classes/Engine/World.h"
@@ -9,7 +10,7 @@
 #include "QuestNode.h"
 #include "QuestAsset.h"
 #include "QuestScript.h"
-#include "QuestStageEvent.h"
+
 
 #include "QuestComponent.h"
 

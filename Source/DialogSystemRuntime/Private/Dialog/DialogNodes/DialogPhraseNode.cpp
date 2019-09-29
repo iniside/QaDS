@@ -1,5 +1,6 @@
-#include "DialogSystemRuntime.h"
 #include "DialogPhraseNode.h"
+#include "DialogSystemRuntime.h"
+
 #include "DialogProcessor.h"
 #include "DialogNodes.h"
 #include "StoryInformationManager.h"

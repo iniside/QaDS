@@ -1,6 +1,7 @@
+#include "QuestAsset.h"
 #include "DialogSystemRuntime.h"
 #include "QuestProcessor.h"
-#include "QuestAsset.h"
+
 #include "QuestScript.h"
 
 void UQuestRuntimeAsset::CreateScript()

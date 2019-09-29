@@ -4,6 +4,7 @@ public class DialogSystemEditor : ModuleRules
 {
     public DialogSystemEditor(ReadOnlyTargetRules Target) : base(Target)
     {
+	    PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicIncludePaths.AddRange(
 	        new string[] {
 		        // ... add public include paths required here ...

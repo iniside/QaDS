@@ -1,5 +1,6 @@
-#include "DialogSystemEditor.h"
 #include "DialogEditorNodes.h"
+#include "DialogSystemEditor.h"
+
 #include "EdGraph/EdGraphPin.h"
 #include "Runtime/Engine/Classes/Engine/World.h"
 #include "StoryInformationManager.h"

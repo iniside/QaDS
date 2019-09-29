@@ -1,5 +1,6 @@
-#include "DialogSystemRuntime.h"
 #include "DialogAsset.h"
+#include "DialogSystemRuntime.h"
+
 #include "DialogNodes.h"
 
 UDialogPhraseNode* UDialogAsset::FindPhraseByUID(const FName& UID) const

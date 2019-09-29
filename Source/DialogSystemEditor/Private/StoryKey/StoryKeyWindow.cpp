@@ -1,5 +1,6 @@
-#include "DialogSystemEditor.h"
 #include "StoryKeyWindow.h"
+#include "DialogSystemEditor.h"
+
 #include "StoryInformationManager.h"
 
 #include "FileManager.h"

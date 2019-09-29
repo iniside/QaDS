@@ -1,8 +1,9 @@
+#include "RectConnectionDrawingPolicy.h"
 #include "DialogSystemEditor.h"
 #include "GraphEditor.h"
 #include "SGraphNode.h"
 #include "Runtime/SlateCore/Public/Rendering/DrawElements.h"
-#include "RectConnectionDrawingPolicy.h"
+
 
 FRectConnectionDrawingPolicy::FRectConnectionDrawingPolicy(int32 InBackLayerID, int32 InFrontLayerID, float ZoomFactor, const FSlateRect& InClippingRect, FSlateWindowElementList& InDrawElements, UEdGraph* InGraphObj)
 : FConnectionDrawingPolicy(InBackLayerID, InFrontLayerID, ZoomFactor, InClippingRect, InDrawElements)

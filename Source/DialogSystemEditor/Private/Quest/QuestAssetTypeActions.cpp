@@ -1,5 +1,6 @@
-#include "DialogSystemEditor.h"
 #include "QuestAssetTypeActions.h"
+#include "DialogSystemEditor.h"
+
 #include "QuestAsset.h"
 #include "QuestAssetEditor.h"
 #include "QuestScript.h"

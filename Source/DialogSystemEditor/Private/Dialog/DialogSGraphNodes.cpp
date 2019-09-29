@@ -1,9 +1,10 @@
+#include "DialogSGraphNodes.h"
 #include "DialogSystemEditor.h"
 #include "GraphEditor.h"
 #include "SInlineEditableTextBlock.h"
 #include "AssetThumbnail.h"
 #include "AssetRegistryModule.h"
-#include "DialogSGraphNodes.h"
+
 #include "QaDSSettings.h"
 #include "SNumericEntryBox.h"
 #include "GraphEditor.h"

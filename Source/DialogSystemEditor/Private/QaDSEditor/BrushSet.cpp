@@ -1,5 +1,6 @@
-#include "DialogSystemEditor.h"
 #include "BrushSet.h"
+#include "DialogSystemEditor.h"
+
 #include "Engine/Texture2D.h"
 #include "CanvasTypes.h"
 #include "IPluginManager.h"

@@ -1,3 +1,4 @@
+#include "DialogGraphSchema.h"
 #include "DialogSystemEditor.h"
 #include "DialogEditorNodes.h"
 #include "EdGraph/EdGraph.h"
@@ -6,7 +7,7 @@
 #include "GenericCommands.h"
 #include "GraphEditorActions.h"
 #include "RectConnectionDrawingPolicy.h"
-#include "DialogGraphSchema.h"
+
 #include "Runtime/Slate/Public/Framework/MultiBox/MultiBoxBuilder.h"
 #include "DialogEditorNodes.h"
 #if ENGINE_MINOR_VERSION > 23

@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "DialogSystemRuntime.h"
 #include "QuestComponent.h"
+#include "DialogSystemRuntime.h"
+
 #include "QuestAsset.h"
 #include "ObjectKey.h"
 #include "QaDSSettings.h"

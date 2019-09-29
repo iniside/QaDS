@@ -1,3 +1,4 @@
+#include "QuestStageEventCustomization.h"
 #include "DialogSystemEditor.h"
 #include "QuestAsset.h"
 #include "QuestScript.h"
@@ -20,7 +21,7 @@
 #include "Widgets/Input/SHyperlink.h"
 #include "ScopedTransaction.h"
 #include "Slate/SlateTextureAtlasInterface.h"
-#include "QuestStageEventCustomization.h"
+
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Editor/UnrealEd/Public/Toolkits/AssetEditorManager.h"
 

@@ -1,3 +1,4 @@
+#include "QuestEditorNodes.h"
 #include "DialogSystemEditor.h"
 #include "GraphEditor.h"
 #include "SInlineEditableTextBlock.h"
@@ -8,7 +9,7 @@
 #include "BrushSet.h"
 #include "Runtime/Slate/Public/Widgets/Layout/SBox.h"
 #include "QuestSGraphNodes.h"
-#include "QuestEditorNodes.h"
+
 
 //SGraphNode_QuestRootNode..................................................................................................................
 FName SGraphNode_QuestRootNode::GetIcon() const

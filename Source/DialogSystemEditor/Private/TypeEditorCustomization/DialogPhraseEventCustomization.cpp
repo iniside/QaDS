@@ -1,3 +1,4 @@
+#include "DialogPhraseEventCustomization.h"
 #include "DialogSystemEditor.h"
 #include "DialogAsset.h"
 #include "DialogScript.h"
@@ -20,7 +21,7 @@
 #include "Widgets/Input/SHyperlink.h"
 #include "ScopedTransaction.h"
 #include "Slate/SlateTextureAtlasInterface.h"
-#include "DialogPhraseEventCustomization.h"
+
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Editor/UnrealEd/Public/Toolkits/AssetEditorManager.h"
 
